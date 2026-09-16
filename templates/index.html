@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0714" />
+  <title>THE HIDDEN COURT · PADEL RANKING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="bg-aurora">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="glow glow-c"></div>
+    <div class="grain"></div>
+  </div>
+
+  <main class="page">
+
+    <header class="hero">
+      <div class="logo-row">
+        <div class="logo-mark">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="2" y="2" width="44" height="44" rx="11" fill="none" stroke="url(#lg)" stroke-width="2.2"/>
+            <path d="M16 12v24M32 12v24M20 10L28 10M20 38l8 0" stroke="url(#lg)" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#c084fc"/>
+                <stop offset="1" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-globe">
+          <span class="brand-line"></span>
+          <h1 class="brand-name">THE&nbsp;HIDDEN&nbsp;COURT</h1>
+          <span class="brand-line"></span>
+        </div>
+      </div>
+      <div class="hero-title-wrap">
+        <h2 class="hero-title"><span class="hero-title-grad">PADEL RANKING</span></h2>
+        <p class="hero-desc" lang="ar">أحدث تصنيف للاعبين &mdash; تابع النقاط والترتيب مباشرة.</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-value" id="stat-players">0</span>
+          <span class="stat-label" lang="ar">لاعبون</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-points">0</span>
+          <span class="stat-label" lang="ar">إجمالي النقاط</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-updated">&nbsp;</span>
+          <span class="stat-label" lang="ar">آخر تحديث</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="search-section">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="search-input" lang="ar" placeholder="ابحث عن لاعب..." autocomplete="off" />
+        <div class="control-pills">
+          <select id="sort-select" aria-label="ترتيب">
+            <option value="rank" selected>الترتيب</option>
+            <option value="points">النقاط</option>
+          </select>
+          <select id="filter-select" lang="ar" aria-label="فلترة">
+            <option value="all" selected>الكل</option>
+            <option value="3">أفضل 3</option>
+            <option value="5">أفضل 5</option>
+            <option value="10">أفضل 10</option>
+            <option value="20">أفضل 20</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="podium-section" id="podium-section" hidden>
+      <h3 class="section-label" lang="ar">أفضل اللاعبين</h3>
+      <div class="podium" id="podium">
+        <article class="podium-card pod-2">
+          <div class="pod-rank">2</div>
+          <div class="pod-avatar" id="pod-2-avatar"></div>
+          <div class="pod-name" id="pod-2-name">&mdash;</div>
+          <div class="pod-points"><span id="pod-2-points">0</span> <small>pt</small></div>
+        </article>
+        <article class="podium-card pod-1">
+          <div class="pod-crown" id="pod-1-crown">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path fill="currentColor" d="M12 2l2.6 5.6 6.1.8-4.4 4.2 1 6.1L12 16l-5.3 2.7 1-6.1L3.3 8.4l6.1-.8z"/>
+            </svg>
+          </div>
+          <div class="pod-rank">1</div>
+          <div class="pod-avatar" id="pod-1-avatar"></div>
+          <div class="pod-name" id="pod-1-name">&mdash;</div>
+          <div class="pod-points"><span id="pod-1-points">0</span> <small>pt</small></div>
+        </article>
+        <article class="podium-card pod-3">
+          <div class="pod-rank">3</div>
+          <div class="pod-avatar" id="pod-3-avatar"></div>
+          <div class="pod-name" id="pod-3-name">&mdash;</div>
+          <div class="pod-points"><span id="pod-3-points">0</span> <small>pt</small></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="ranking-section">
+      <h3 class="section-label" lang="ar" id="ranking-label">الترتيب</h3>
+      <div class="panel">
+        <div class="table-scroll">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th class="th-rank">#</th>
+                <th class="th-player">اللاعب</th>
+                <th class="th-num">النقاط</th>
+                <th class="th-updated">آخر تحديث</th>
+              </tr>
+            </thead>
+            <tbody id="ranking-body"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state" hidden lang="ar">
+            لا يوجد لاعبون مطابقون.
+          </div>
+        </div>
+      </div>
+      <div class="table-foot">
+        <span class="live-dot"></span>
+        <span id="foot-status" lang="ar">يتم التحديث تلقائيًا...</span>
+        <a class="admin-link" href="/admin" lang="ar">لوحة الإدارة</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span class="footer-mark">HC</span>
+    <span>&copy; <span id="year"></span> THE HIDDEN COURT &mdash; Padel League</span>
+  </footer>
+
+  <noscript>
+    <style>.page{visibility:hidden}</style>
+    <div style="position:fixed;inset:0;display:grid;place-items:center;color:#e9d5ff;font-family:sans-serif;background:#0b0714">الرجاء تفعيل JavaScript.</div>
+  </noscript>
+
+  <script src="{{ url_for('static', filename='js/public.js') }}"></script>
+</body>
+</html>

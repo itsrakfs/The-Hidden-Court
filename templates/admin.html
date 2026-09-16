@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0714" />
+  <title>ADMIN · THE HIDDEN COURT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+  <!-- ============================= LOGIN VIEW ============================= -->
+  <div class="bg-aurora">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="glow glow-c"></div>
+    <div class="grain"></div>
+  </div>
+
+  <main class="login-screen" id="login-screen" hidden>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="2" y="2" width="44" height="44" rx="11" fill="none" stroke="url(#lg)" stroke-width="2.2"/>
+            <path d="M16 12v24M32 12v24M20 10L28 10M20 38l8 0" stroke="url(#lg)" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#c084fc"/>
+                <stop offset="1" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1>THE HIDDEN COURT</h1>
+        <span class="login-subtitle">ADMIN ACCESS</span>
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="login-username" lang="ar">اسم المستخدم</label>
+          <input id="login-username" name="username" type="text" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="login-password" lang="ar">كلمة المرور</label>
+          <div class="pass-wrap">
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+            <button type="button" class="pass-toggle" id="pass-toggle" aria-label="إظهار كلمة المرور" tabindex="-1">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="login-error" id="login-error" hidden lang="ar"></p>
+        <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+          <span>تسجيل الدخول</span>
+        </button>
+      </form>
+
+      <a class="back-link" href="/" lang="ar">&larr; العودة إلى التصنيف</a>
+    </div>
+  </main>
+
+  <!-- ============================ DASHBOARD VIEW ============================ -->
+  <div class="dashboard" id="dashboard" hidden>
+    <aside class="side">
+      <div class="side-head">
+        <div class="logo-mark small">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="2" y="2" width="44" height="44" rx="11" fill="none" stroke="url(#lg2)" stroke-width="2.2"/>
+            <path d="M16 12v24M32 12v24M20 10L28 10M20 38l8 0" stroke="url(#lg2)" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#c084fc"/>
+                <stop offset="1" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <strong>THE HIDDEN COURT</strong>
+          <span class="side-sub">ADMIN DASHBOARD</span>
+        </div>
+      </div>
+
+      <nav class="side-nav">
+        <a class="nav-item" href="/" target="_blank">
+          <svg viewBox="0 0 24 24" width="17" height="17"><path d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <span lang="ar">عرض التصنيف العام</span>
+        </a>
+        <a class="nav-item" href="#players-section">
+          <svg viewBox="0 0 24 24" width="17" height="17"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.8-3.5 3.4-5 6.5-5s5.7 1.5 6.5 5M16 3.5a3.5 3.5 0 010 6.6M18.5 15c2 .7 3.2 2.4 3 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span lang="ar">إدارة اللاعبين</span>
+        </a>
+      </nav>
+
+      <div class="side-foot">
+        <div class="admin-chip">
+          <span class="avatar" id="admin-avatar">R</span>
+          <div>
+            <strong id="admin-name">admin</strong>
+            <span class="side-sub" lang="ar">مدير الموقع</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-block" id="logout-btn" lang="ar">
+          تسجيل الخروج
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div>
+          <h1 class="topbar-title"><span class="grad-text" lang="ar">لوحة التحكم</span></h1>
+          <p class="topbar-sub" lang="ar">إدارة تصنيف دورات البادل</p>
+        </div>
+        <button class="btn btn-primary" id="add-player-btn">
+          <span class="btn-plus">+</span> <span lang="ar">إضافة لاعب</span>
+        </button>
+      </header>
+
+      <div class="kpi-grid">
+        <div class="kpi">
+          <span class="kpi-label" lang="ar">عدد اللاعبين</span>
+          <span class="kpi-value" id="kpi-players">0</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label" lang="ar">إجمالي النقاط</span>
+          <span class="kpi-value" id="kpi-points">0</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label" lang="ar">آخر تحديث</span>
+          <span class="kpi-value kpi-small" id="kpi-updated">&mdash;</span>
+        </div>
+      </div>
+
+      <div class="admin-search">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="admin-search" lang="ar" placeholder="ابحث داخل الجدول..." autocomplete="off" />
+      </div>
+
+      <div class="panel" id="players-section">
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th class="th-rank">#</th>
+                <th class="th-player">اللاعب</th>
+                <th class="th-num">النقاط</th>
+                <th class="th-actions"></th>
+              </tr>
+            </thead>
+            <tbody id="admin-body"></tbody>
+          </table>
+          <div class="empty-state" id="admin-empty" hidden lang="ar">
+            لا يوجد لاعبون بعد. ابدأ بإضافة أول لاعب.
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" hidden></div>
+    </section>
+  </div>
+
+  <!-- ================================ PLAYER MODAL ================================ -->
+  <div class="modal-bg" id="modal-bg" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h2 id="modal-title" lang="ar">إضافة لاعب</h2>
+        <button class="icon-btn" id="modal-close" aria-label="إغلاق">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <form id="player-form" novalidate>
+        <input type="hidden" id="pf-id" />
+        <div class="field">
+          <label for="pf-name" lang="ar">اسم اللاعب *</label>
+          <input id="pf-name" type="text" lang="ar" placeholder="مثال: Ahmed El Gohary" required />
+        </div>
+        <div class="field">
+          <label for="pf-points" lang="ar">النقاط *</label>
+          <input id="pf-points" type="number" min="0" step="1" value="0" />
+        </div>
+        <p class="login-error" id="pf-error" hidden lang="ar"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="modal-cancel" lang="ar">إلغاء</button>
+          <button type="submit" class="btn btn-primary" id="pf-submit" lang="ar">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="confirm-bg" hidden>
+    <div class="modal modal-sm" role="alertdialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 lang="ar">تأكيد الحذف</h2>
+      </div>
+      <p class="confirm-text" lang="ar" id="confirm-text"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirm-cancel" lang="ar">إلغاء</button>
+        <button type="button" class="btn btn-danger" id="confirm-yes" lang="ar">حذف نهائي</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <style>.login-screen,.dashboard{visibility:hidden}</style>
+    <div style="position:fixed;inset:0;display:grid;place-items:center;color:#e9d5ff;font-family:sans-serif;background:#0b0714">الرجاء تفعيل JavaScript.</div>
+  </noscript>
+
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

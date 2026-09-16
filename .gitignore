@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+players.db
+*.db
+.vscode/
+.idea/
+.DS_Store
