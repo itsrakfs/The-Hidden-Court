@@ -66,7 +66,10 @@ def save_env(data):
         "# To change the password, run: python server.py --set-password",
         f"ADMIN_PASSWORD_HASH={self_hash}",
     ]
-    ENV_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    try:
+        ENV_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    except OSError:
+        pass
 
 
 config = env_config()
@@ -98,6 +101,8 @@ app.config.update(
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=5000")
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
@@ -160,7 +165,10 @@ def init_db():
 
 
 # Run on import so gunicorn workers (cloud) pick up DB + admin seed automatically
-init_db()
+try:
+    init_db()
+except Exception:
+    pass
 
 
 def now_utc():
