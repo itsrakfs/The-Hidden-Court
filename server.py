@@ -9,6 +9,7 @@ The password is never stored as plain text.
 """
 
 import argparse
+import json
 import os
 import secrets
 import sqlite3
@@ -22,6 +23,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
 DB_PATH = BASE_DIR / "players.db"
+SEED_PATH = BASE_DIR / "seed_players.json"
 
 
 # --------------------------------------------------------------------------
@@ -151,6 +153,44 @@ def migrate_players(conn):
     )
 
 
+def restore_from_seed(conn):
+    """Re-populate an empty players table from the committed seed file.
+
+    Railway gives every deploy a fresh disk, so the SQLite database starts
+    empty each time. seed_players.json (kept under version control) serves as
+    the free-of-charge backup: whenever the table is empty at startup we
+    restore the last exported snapshot automatically.
+    """
+    if not SEED_PATH.exists():
+        return False
+    if conn.execute("SELECT COUNT(*) AS c FROM players").fetchone()["c"] > 0:
+        return False
+    try:
+        data = json.loads(SEED_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+
+    seeded = 0
+    for entry in data.get("players", []):
+        name = (entry.get("name") or "").strip()
+        if not name:
+            continue
+        try:
+            points = max(0, int(entry.get("points", 0)))
+        except (TypeError, ValueError):
+            points = 0
+        team = (entry.get("team") or "").strip()[:40]
+        created = entry.get("created_at") or now_utc()
+        updated = entry.get("updated_at") or created
+        conn.execute(
+            """INSERT INTO players (name, points, team, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (name, points, team, created, updated),
+        )
+        seeded += 1
+    return seeded > 0
+
+
 def init_db():
     with get_db() as conn:
         conn.executescript(
@@ -171,6 +211,7 @@ def init_db():
             """
         )
         migrate_players(conn)
+        restore_from_seed(conn)
         if ADMIN_PASSWORD_HASH:
             existing = conn.execute(
                 "SELECT 1 FROM admins WHERE username = ?", (ADMIN_USERNAME,)
@@ -386,6 +427,30 @@ def api_delete_player(player_id):
             return jsonify({"error": "Player not found"}), 404
         conn.execute("DELETE FROM players WHERE id = ?", (player_id,))
         return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/backup")
+@admin_required
+def api_backup():
+    """Download the current players as a seed_players.json snapshot.
+
+    The exported file can replace seed_players.json in the repo, turning
+    it into a version-controlled backup that survives Railway redeploys.
+    """
+    from flask import Response
+
+    with get_db() as conn:
+        rows = conn.execute(
+            """SELECT name, points, team, created_at, updated_at
+               FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""
+        ).fetchall()
+    payload = {"players": [dict(r) for r in rows]}
+    body = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    return Response(
+        body,
+        mimetype="application/json",
+        headers={"Content-Disposition": "attachment; filename=seed_players.json"},
+    )
 
 
 # --------------------------------------------------------------------------

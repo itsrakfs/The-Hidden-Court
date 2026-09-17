@@ -326,6 +326,14 @@ body {
 }
 .topbar-title { font-family: var(--font-display); font-weight: 800; font-size: 30px; }
 .topbar-sub { color: var(--ink-faint); font-size: 14px; margin-top: 4px; }
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.topbar-actions .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.topbar-actions .btn-ghost:disabled { opacity: 0.6; cursor: wait; }
 
 .kpi-grid {
   display: grid;

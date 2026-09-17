@@ -140,6 +140,34 @@
       });
   }
 
+  function handleBackup() {
+    var btn = els.backupBtn;
+    if (btn) btn.disabled = true;
+    fetch("/api/backup", {
+      method: "GET",
+      credentials: "same-origin",
+      headers: { "Accept": "application/json" },
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.blob();
+      })
+      .then(function (blob) {
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "seed_players.json";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 300);
+      })
+      .catch(function () {
+        showToast("فشل إنشاء النسخة الاحتياطية");
+      })
+      .finally(function () {
+        if (btn) btn.disabled = false;
+      });
+  }
+
   function setAdminIdentity(username) {
     els.adminName.textContent = username || "admin";
     els.adminAvatar.textContent = (username || "A").charAt(0).toUpperCase();
@@ -391,6 +419,7 @@
     });
 
     els.addPlayerBtn.addEventListener("click", openAddModal);
+    if (els.backupBtn) els.backupBtn.addEventListener("click", handleBackup);
     els.modalClose.addEventListener("click", closeModal);
     els.modalCancel.addEventListener("click", closeModal);
     els.modalBg.addEventListener("click", function (e) { if (e.target === els.modalBg) closeModal(); });
@@ -436,6 +465,7 @@
       adminEmpty: $("admin-empty"),
 
       addPlayerBtn: $("add-player-btn"),
+      backupBtn: $("backup-btn"),
       modalBg: $("modal-bg"),
       modalTitle: $("modal-title"),
       modalClose: $("modal-close"),

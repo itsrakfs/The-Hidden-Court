@@ -1,0 +1,18 @@
+{
+  "players": [
+    {"name": "Mohamed Reda", "points": 9, "team": "", "created_at": "2026-09-16T12:59:42+00:00", "updated_at": "2026-09-16T12:59:42+00:00"},
+    {"name": "Waleed Allam", "points": 9, "team": "", "created_at": "2026-09-16T13:00:04+00:00", "updated_at": "2026-09-16T13:00:04+00:00"},
+    {"name": "Anas Fayed", "points": 8, "team": "", "created_at": "2026-09-16T13:00:18+00:00", "updated_at": "2026-09-16T13:00:18+00:00"},
+    {"name": "Eyad Eleterby", "points": 7, "team": "", "created_at": "2026-09-16T13:00:41+00:00", "updated_at": "2026-09-16T13:00:41+00:00"},
+    {"name": "Marawan Elsaadany", "points": 5, "team": "", "created_at": "2026-09-16T13:01:18+00:00", "updated_at": "2026-09-16T13:01:18+00:00"},
+    {"name": "Noor Elsherbeny", "points": 5, "team": "", "created_at": "2026-09-16T13:01:47+00:00", "updated_at": "2026-09-16T13:01:47+00:00"},
+    {"name": "Ahmed Ramadan", "points": 4, "team": "", "created_at": "2026-09-16T13:02:08+00:00", "updated_at": "2026-09-16T13:02:08+00:00"},
+    {"name": "Mohamed Salah", "points": 3, "team": "", "created_at": "2026-09-16T13:02:35+00:00", "updated_at": "2026-09-16T13:02:35+00:00"},
+    {"name": "Ali Maged", "points": 3, "team": "", "created_at": "2026-09-16T13:04:44+00:00", "updated_at": "2026-09-16T13:04:44+00:00"},
+    {"name": "Adel Eltahan", "points": 2, "team": "", "created_at": "2026-09-16T13:05:01+00:00", "updated_at": "2026-09-16T13:05:01+00:00"},
+    {"name": "Makram Mahmoud", "points": 2, "team": "", "created_at": "2026-09-16T13:05:37+00:00", "updated_at": "2026-09-16T13:05:37+00:00"},
+    {"name": "Ahmed Ayaad", "points": 1, "team": "", "created_at": "2026-09-16T13:05:52+00:00", "updated_at": "2026-09-16T13:05:52+00:00"},
+    {"name": "Ahmed Hany", "points": 1, "team": "", "created_at": "2026-09-16T13:06:22+00:00", "updated_at": "2026-09-16T13:06:22+00:00"},
+    {"name": "Zeyad Meshaal", "points": 1, "team": "", "created_at": "2026-09-16T13:06:36+00:00", "updated_at": "2026-09-16T13:06:36+00:00"}
+  ]
+}
