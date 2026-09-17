@@ -22,7 +22,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
-DB_PATH = BASE_DIR / "players.db"
+
+# DB_PATH can be overridden with an environment variable so the SQLite file can
+# live on a persistent Railway volume (survives redeploys). Falls back to the
+# project folder for local development.
+DB_PATH = Path(os.environ.get("DB_PATH") or (BASE_DIR / "players.db")).expanduser()
 SEED_PATH = BASE_DIR / "seed_players.json"
 
 
