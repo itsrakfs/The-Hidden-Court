@@ -204,6 +204,8 @@
         els["pod" + r + "Name"].textContent = "\u2014";
         els["pod" + r + "Points"].textContent = "0";
         els["pod" + r + "Avatar"].textContent = "?";
+        els["pod" + r + "Avatar"].className = "pod-avatar";
+        els["pod" + r + "Avatar"].onclick = null;
         var t = els["pod" + r + "Trend"];
         if (t) { t.textContent = ""; t.className = "trend"; }
         return;
@@ -216,6 +218,13 @@
       els["pod" + r + "Name"].textContent = p.name;
       els["pod" + r + "Points"].textContent = p.points;
       els["pod" + r + "Avatar"].textContent = initials(p.name);
+
+      var nameEl = els["pod" + r + "Name"];
+      nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>';
+      if (els["pod" + r + "Avatar"]) {
+        els["pod" + r + "Avatar"].className = "pod-avatar pod-avatar-link";
+        els["pod" + r + "Avatar"].onclick = function () { location.href = "/player/" + p.id; };
+      }
 
       var team = els["pod" + r + "Team"];
       if (team) team.textContent = (p.team || "").trim() || "";
@@ -252,9 +261,11 @@
         '<tr data-player-id="' + p.id + '">' +
           '<td class="th-rank"><span class="num">' + p.rank + '</span></td>' +
           '<td class="th-player"><div class="player-cell">' +
-            '<span class="initials">' + escapeHtml(initials(p.name)) + '</span>' +
+            '<a class="initials" href="/player/' + p.id + '" aria-label="بروفايل ' + escapeHtml(p.name) + '">' + escapeHtml(initials(p.name)) + '</a>' +
             '<span class="player-name-cell">' +
-              escapeHtml(p.name) +
+              '<a class="player-link" href="/player/' + p.id + '">' +
+                escapeHtml(p.name) +
+              '</a>' +
               (isNew(p) ? '<span class="new-badge">\u062c\u062f\u064a\u062f</span>' : "") +
             '</span>' +
             teamLabel(p) +

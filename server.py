@@ -198,13 +198,36 @@ def restore_from_seed(conn):
             direction = max(-1, min(1, int(direction)))
         except (TypeError, ValueError):
             direction = 0
-        conn.execute(
+        cur = conn.execute(
             """INSERT INTO players
                    (name, points, team, created_at, updated_at, points_changed_at, points_direction)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (name, points, team, created, updated, changed, direction),
         )
+        inserted_path = conn.execute("""INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
+               VALUES (?, ?, ?, ?, ?)""", (cur.lastrowid, 0, points, points, created))
         seeded += 1
+
+    # Replay each player's own recorded history (if the backup included it).
+    for entry in data.get("players", []):
+        name = (entry.get("name") or "").strip()
+        if not name:
+            continue
+        row = conn.execute("SELECT id FROM players WHERE name = ?", (name,)).fetchone()
+        if not row:
+            continue
+        for h in entry.get("points_history", []):
+            try:
+                old_p = max(0, int(h.get("old_points", 0)))
+                new_p = max(0, int(h.get("new_points", 0)))
+            except (TypeError, ValueError):
+                continue
+            delta = new_p - old_p if "delta" not in h else h.get("delta", 0)
+            conn.execute(
+                """INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (row["id"], old_p, new_p, delta, h.get("created_at") or created),
+            )
     return seeded > 0
 
 
@@ -227,6 +250,16 @@ def init_db():
                 username      TEXT NOT NULL UNIQUE,
                 password_hash TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS point_history (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                player_id   INTEGER NOT NULL,
+                old_points  INTEGER NOT NULL DEFAULT 0,
+                new_points  INTEGER NOT NULL DEFAULT 0,
+                delta       INTEGER NOT NULL DEFAULT 0,
+                created_at  TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_point_history_player
+                ON point_history (player_id, created_at);
             """
         )
         migrate_players(conn)
@@ -341,6 +374,16 @@ def admin_page():
     return render_template("admin.html")
 
 
+@app.route("/player/<int:player_id>")
+def player_page(player_id):
+    return render_template("player.html", player_id=player_id)
+
+
+@app.route("/rules")
+def rules_page():
+    return render_template("rules.html")
+
+
 # --------------------------------------------------------------------------
 # Public API
 # --------------------------------------------------------------------------
@@ -348,6 +391,46 @@ def admin_page():
 def api_ranking():
     with get_db() as conn:
         return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/players/<int:player_id>/history")
+def api_player_history(player_id):
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT * FROM players WHERE id = ?", (player_id,)
+        ).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        history = conn.execute(
+            """SELECT id, old_points, new_points, delta, created_at
+               FROM point_history WHERE player_id = ?
+               ORDER BY created_at ASC, id ASC""",
+            (player_id,),
+        ).fetchall()
+
+        ranking = fetch_ranking(conn)["players"]
+        player = next((p for p in ranking if p["id"] == player_id), None)
+
+        # Season stats derived from the points history.
+        season_points = sum(h["delta"] for h in history)
+        peak = max((h["new_points"] for h in history), default=row["points"])
+        matches = len(history)
+
+        return jsonify({
+            "player": player or {
+                "id": row["id"], "rank": None, "name": row["name"],
+                "points": row["points"], "team": row["team"],
+                "created_at": row["created_at"], "updated_at": row["updated_at"],
+                "trend": trend_for(row),
+            },
+            "history": [dict(h) for h in history],
+            "stats": {
+                "season_points": season_points,
+                "peak": peak,
+                "matches": matches,
+            },
+        })
 
 
 @app.route("/api/auth/me")
@@ -433,6 +516,11 @@ def api_add_player():
             (payload["name"], payload["points"], payload["team"], ts, ts),
         )
         new_id = cursor.lastrowid
+        conn.execute(
+            """INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (new_id, 0, payload["points"], payload["points"], ts),
+        )
         return jsonify(fetch_ranking(conn) | {"created_id": new_id}), 201
 
 
@@ -457,10 +545,14 @@ def api_update_player(player_id):
         direction = row["points_direction"]
 
         if new_points != old_points:
-            # Record the direction/time of the points change; the frontend
-            # shows an up/down arrow for the following 3 days.
             changed_at = ts
             direction = 1 if new_points > old_points else -1
+            conn.execute(
+                """INSERT INTO point_history
+                       (player_id, old_points, new_points, delta, created_at)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (player_id, old_points, new_points, new_points - old_points, ts),
+            )
 
         conn.execute(
             """UPDATE players
@@ -489,6 +581,7 @@ def api_delete_player(player_id):
         if not row:
             return jsonify({"error": "Player not found"}), 404
         conn.execute("DELETE FROM players WHERE id = ?", (player_id,))
+        conn.execute("DELETE FROM point_history WHERE player_id = ?", (player_id,))
         return jsonify(fetch_ranking(conn))
 
 
@@ -504,11 +597,23 @@ def api_backup():
 
     with get_db() as conn:
         rows = conn.execute(
-            """SELECT name, points, team, created_at, updated_at,
+            """SELECT id, name, points, team, created_at, updated_at,
                       points_changed_at, points_direction
                FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""
         ).fetchall()
-    payload = {"players": [dict(r) for r in rows]}
+        players = []
+        for r in rows:
+            pl = dict(r)
+            hist = conn.execute(
+                """SELECT old_points, new_points, delta, created_at
+                   FROM point_history
+                   WHERE player_id = ? ORDER BY created_at ASC, id ASC""",
+                (r["id"],),
+            ).fetchall()
+            pl["points_history"] = [dict(h) for h in hist]
+            del pl["id"]
+            players.append(pl)
+    payload = {"players": players}
     body = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     return Response(
         body,

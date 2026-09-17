@@ -481,6 +481,26 @@ body {
 
 .player-cell { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--violet-1); }
 .player-name-cell { display: inline-flex; align-items: center; gap: 7px; }
+a.player-link {
+  color: var(--violet-1);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a.player-link:hover { color: var(--violet-2); text-decoration: underline; }
+a.initials {
+  color: var(--violet-1);
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+a.initials:hover { filter: brightness(1.3); }
+.pod-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.pod-link:hover { color: var(--violet-2); }
+.pod-avatar-link { cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; }
+.pod-avatar-link:hover { transform: scale(1.07); filter: brightness(1.25); }
 .team-tag {
   flex: none;
   font-family: var(--font-display);
@@ -622,6 +642,218 @@ body {
   color: #fff;
   font-weight: 800;
   font-size: 12px;
+}
+.footer-link {
+  color: var(--ink-faint);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+.footer-link:hover { color: var(--violet-2); }
+
+/* ------------------------------------------------------- profile page */
+.profile-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-dim);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+.back-link:hover { color: var(--violet-1); }
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 22px;
+  backdrop-filter: blur(14px);
+}
+.profile-avatar {
+  flex: none;
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--violet-1);
+  border: 1px solid rgba(192, 132, 252, 0.4);
+}
+.profile-hero > div:nth-child(2) { flex: 1; min-width: 0; }
+.profile-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.profile-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--violet-2);
+  font-size: 14px;
+}
+.profile-points {
+  text-align: center;
+  flex: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.35), rgba(91, 33, 182, 0.35));
+  border: 1px solid rgba(192, 132, 252, 0.35);
+}
+.profile-points-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--violet-1);
+}
+.profile-points-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin-left: 4px;
+}
+.profile-stats { margin-bottom: 22px; }
+
+.chart-panel { margin-bottom: 22px; padding: 22px 24px; }
+.chart-wrap { margin-top: 14px; }
+#chart {
+  width: 100%;
+  height: 200px;
+  display: block;
+  overflow: visible;
+}
+
+.history-panel { margin-bottom: 26px; padding: 22px 24px; }
+.history-list { list-style: none; margin-top: 14px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.history-item:last-child { border-bottom: none; }
+.hist-date {
+  font-family: var(--font-body);
+  color: var(--ink-dim);
+  font-size: 13px;
+  min-width: 130px;
+}
+.hist-change { flex: 1; text-align: left; }
+.delta {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.hist-up { color: #8ef0b0; background: rgba(142, 240, 176, 0.12); }
+.hist-down { color: #fda4af; background: rgba(253, 164, 175, 0.12); }
+.hist-flat { color: var(--ink-faint); background: rgba(168, 133, 255, 0.1); }
+.hist-range {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 70px;
+  text-align: center;
+}
+
+/* --------------------------------------------------------- rules page */
+.rules-head { text-align: center; margin-bottom: 26px; }
+.rules-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 34px;
+}
+.rules-sub { color: var(--ink-faint); margin-top: 8px; }
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  padding: 28px;
+  margin-bottom: 26px;
+}
+.rule-block h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--violet-1);
+  margin-bottom: 12px;
+}
+.rule-list { list-style: none; }
+.rule-list li {
+  padding: 8px 0;
+  color: var(--ink-dim);
+  line-height: 1.7;
+  position: relative;
+  padding-right: 18px;
+}
+.rule-list li::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 17px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--violet-3);
+}
+.rule-list strong { color: var(--ink); }
+.points-scale { display: grid; gap: 8px; }
+.ps-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(168, 133, 255, 0.06);
+}
+.ps-place {
+  min-width: 70px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+}
+.ps-dots {
+  flex: 1;
+  border-bottom: 1px dashed rgba(168, 133, 255, 0.25);
+}
+.ps-pts {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--violet-2);
+}
+
+@media (max-width: 720px) {
+  .profile-hero { flex-direction: column; align-items: flex-start; }
+  .profile-points { width: 100%; }
+  .history-item { flex-wrap: wrap; }
+  .hist-date { min-width: 100%; }
 }
 
 ::selection { background: rgba(168, 85, 247, 0.4); color: #fff; }
