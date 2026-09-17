@@ -17,7 +17,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=6" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=7" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
 </head>
@@ -134,11 +134,27 @@
         </div>
       </section>
 
+      <section class="rule-card rule-card--att" data-rules>
+        <div class="rule-card-head">
+          <span class="rule-ico rule-ico--warn">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3L2.8 20h18.4L12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9.5v4M12 16.5v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <div>
+            <span class="rule-kicker" lang="ar">الالتزام</span>
+            <h2 class="rule-title" lang="ar">التسجيل والإلغاء</h2>
+          </div>
+        </div>
+        <ul class="rule-list" lang="ar">
+          <li>اللي يسجل اسمه في الدورة وبعدين <strong>يلغي أو يرجّل قبل البطولة بيوم أو أقل</strong> → عليه <strong>‎-1 نقطة</strong>.</li>
+          <li>الخصم بينزل مباشرة على رصيده في <strong>ترتيب الموقع</strong>.</li>
+        </ul>
+      </section>
+
     </div>
 
     <div class="rules-cta" data-rules>
       <span class="rules-cta-glow"></span>
-      <p lang="ar">يعيش، يتنفس، <strong>اتنين على اتنين</strong>.</p>
+      <p><strong>The Hidden Court never forgets.</strong></p>
       <a class="btn-solid" href="/" lang="ar">عرض الترتيب ←</a>
     </div>
 
