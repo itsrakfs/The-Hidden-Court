@@ -214,7 +214,9 @@ def restore_from_seed(conn):
 
         # If the seed snapshot contains a real points history replay it as-is
         # so profiles keep their progression (old -> current) across deploys.
-        # Otherwise we create a single "0 -> points" baseline row.
+        # Otherwise we create a single "0 -> points" baseline row (only for
+        # players that have points; a fresh 0-point player keeps an empty
+        # history so the profile starts clean).
         hist = entry.get("points_history") or []
         if hist:
             for h in hist:
@@ -229,7 +231,7 @@ def restore_from_seed(conn):
                        VALUES (?, ?, ?, ?, ?)""",
                     (player_id, old_p, new_p, delta, h.get("created_at") or created),
                 )
-        else:
+        elif points > 0:
             conn.execute("""INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
                    VALUES (?, ?, ?, ?, ?)""", (player_id, 0, points, points, created))
     return seeded > 0
