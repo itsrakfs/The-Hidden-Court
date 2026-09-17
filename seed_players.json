@@ -5,18 +5,64 @@
       "points": 9,
       "team": "",
       "created_at": "2026-09-16T12:59:42+00:00",
-      "updated_at": "2026-09-16T12:59:42+00:00",
-      "points_changed_at": "",
-      "points_direction": 0
+      "updated_at": "2026-09-17T22:35:57+00:00",
+      "points_changed_at": "2026-09-17T22:35:57+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 9,
+          "delta": 9,
+          "created_at": "2026-09-16T12:59:42+00:00"
+        },
+        {
+          "old_points": 9,
+          "new_points": 0,
+          "delta": -9,
+          "created_at": "2026-09-17T22:35:11+00:00"
+        },
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-17T22:35:35+00:00"
+        },
+        {
+          "old_points": 5,
+          "new_points": 9,
+          "delta": 4,
+          "created_at": "2026-09-17T22:35:57+00:00"
+        }
+      ]
     },
     {
       "name": "Waleed Allam",
       "points": 9,
       "team": "",
       "created_at": "2026-09-16T13:00:04+00:00",
-      "updated_at": "2026-09-16T13:00:04+00:00",
-      "points_changed_at": "",
-      "points_direction": 0
+      "updated_at": "2026-09-17T22:35:48+00:00",
+      "points_changed_at": "2026-09-17T22:35:48+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 9,
+          "delta": 9,
+          "created_at": "2026-09-16T13:00:04+00:00"
+        },
+        {
+          "old_points": 9,
+          "new_points": 5,
+          "delta": -4,
+          "created_at": "2026-09-17T22:35:18+00:00"
+        },
+        {
+          "old_points": 5,
+          "new_points": 9,
+          "delta": 4,
+          "created_at": "2026-09-17T22:35:48+00:00"
+        }
+      ]
     },
     {
       "name": "Anas Fayed",
@@ -25,7 +71,15 @@
       "created_at": "2026-09-16T13:00:18+00:00",
       "updated_at": "2026-09-16T13:00:18+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 8,
+          "delta": 8,
+          "created_at": "2026-09-16T13:00:18+00:00"
+        }
+      ]
     },
     {
       "name": "Eyad Eleterby",
@@ -34,7 +88,15 @@
       "created_at": "2026-09-16T13:00:41+00:00",
       "updated_at": "2026-09-16T13:00:41+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 7,
+          "delta": 7,
+          "created_at": "2026-09-16T13:00:41+00:00"
+        }
+      ]
     },
     {
       "name": "Marawan Elsaadany",
@@ -43,7 +105,15 @@
       "created_at": "2026-09-16T13:01:18+00:00",
       "updated_at": "2026-09-17T13:13:35+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-16T13:01:18+00:00"
+        }
+      ]
     },
     {
       "name": "Noor Elsherbeny",
@@ -52,7 +122,15 @@
       "created_at": "2026-09-16T13:01:47+00:00",
       "updated_at": "2026-09-16T13:01:47+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-16T13:01:47+00:00"
+        }
+      ]
     },
     {
       "name": "Ahmed Ramadan",
@@ -61,7 +139,15 @@
       "created_at": "2026-09-16T13:02:08+00:00",
       "updated_at": "2026-09-16T13:02:08+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 4,
+          "delta": 4,
+          "created_at": "2026-09-16T13:02:08+00:00"
+        }
+      ]
     },
     {
       "name": "Ali Maged",
@@ -70,7 +156,15 @@
       "created_at": "2026-09-16T13:04:44+00:00",
       "updated_at": "2026-09-16T13:04:44+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-16T13:04:44+00:00"
+        }
+      ]
     },
     {
       "name": "Mohamed Salah",
@@ -79,7 +173,15 @@
       "created_at": "2026-09-16T13:02:35+00:00",
       "updated_at": "2026-09-16T13:02:35+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-16T13:02:35+00:00"
+        }
+      ]
     },
     {
       "name": "Adel Eltahan",
@@ -88,7 +190,15 @@
       "created_at": "2026-09-16T13:05:01+00:00",
       "updated_at": "2026-09-16T13:05:01+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 2,
+          "delta": 2,
+          "created_at": "2026-09-16T13:05:01+00:00"
+        }
+      ]
     },
     {
       "name": "Makram Mahmoud",
@@ -97,7 +207,15 @@
       "created_at": "2026-09-16T13:05:37+00:00",
       "updated_at": "2026-09-16T13:05:37+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 2,
+          "delta": 2,
+          "created_at": "2026-09-16T13:05:37+00:00"
+        }
+      ]
     },
     {
       "name": "Ahmed Ayaad",
@@ -106,7 +224,15 @@
       "created_at": "2026-09-16T13:05:52+00:00",
       "updated_at": "2026-09-16T13:05:52+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-16T13:05:52+00:00"
+        }
+      ]
     },
     {
       "name": "Ahmed Hany",
@@ -115,7 +241,15 @@
       "created_at": "2026-09-16T13:06:22+00:00",
       "updated_at": "2026-09-16T13:06:22+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-16T13:06:22+00:00"
+        }
+      ]
     },
     {
       "name": "Zeyad Meshaal",
@@ -124,7 +258,15 @@
       "created_at": "2026-09-16T13:06:36+00:00",
       "updated_at": "2026-09-16T13:06:36+00:00",
       "points_changed_at": "",
-      "points_direction": 0
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-16T13:06:36+00:00"
+        }
+      ]
     }
   ]
 }

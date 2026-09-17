@@ -209,30 +209,29 @@ def restore_from_seed(conn):
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (name, points, team, created, updated, changed, direction),
         )
-        inserted_path = conn.execute("""INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
-               VALUES (?, ?, ?, ?, ?)""", (cur.lastrowid, 0, points, points, created))
+        player_id = cur.lastrowid
         seeded += 1
 
-    # Replay each player's own recorded history (if the backup included it).
-    for entry in data.get("players", []):
-        name = (entry.get("name") or "").strip()
-        if not name:
-            continue
-        row = conn.execute("SELECT id FROM players WHERE name = ?", (name,)).fetchone()
-        if not row:
-            continue
-        for h in entry.get("points_history", []):
-            try:
-                old_p = max(0, int(h.get("old_points", 0)))
-                new_p = max(0, int(h.get("new_points", 0)))
-            except (TypeError, ValueError):
-                continue
-            delta = new_p - old_p if "delta" not in h else h.get("delta", 0)
-            conn.execute(
-                """INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
-                   VALUES (?, ?, ?, ?, ?)""",
-                (row["id"], old_p, new_p, delta, h.get("created_at") or created),
-            )
+        # If the seed snapshot contains a real points history replay it as-is
+        # so profiles keep their progression (old -> current) across deploys.
+        # Otherwise we create a single "0 -> points" baseline row.
+        hist = entry.get("points_history") or []
+        if hist:
+            for h in hist:
+                try:
+                    old_p = max(0, int(h.get("old_points", 0)))
+                    new_p = max(0, int(h.get("new_points", 0)))
+                except (TypeError, ValueError):
+                    continue
+                delta = new_p - old_p if "delta" not in h else h.get("delta", 0)
+                conn.execute(
+                    """INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (player_id, old_p, new_p, delta, h.get("created_at") or created),
+                )
+        else:
+            conn.execute("""INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
+                   VALUES (?, ?, ?, ?, ?)""", (player_id, 0, points, points, created))
     return seeded > 0
 
 
