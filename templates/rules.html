@@ -17,7 +17,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=5" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=6" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
 </head>
@@ -31,53 +31,115 @@
 
   <main class="page">
 
-    <nav class="profile-nav">
-      <a class="back-link" href="/" lang="ar">
-        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span lang="ar">العودة للترتيب</span>
-      </a>
+    <nav class="topnav">
+      <div class="topnav-brand">
+        <span class="footer-mark">HC</span>
+        <span class="topnav-name">THE HIDDEN COURT</span>
+      </div>
+      <div class="topnav-links">
+        <a class="nav-link nav-link--ghost" href="/" lang="ar">الترتيب</a>
+        <a class="nav-link" href="/rules" lang="ar"><span class="nav-icon">⚡</span> قواعد الدوري</a>
+      </div>
     </nav>
 
-    <section class="rules-head">
-      <h1 class="rules-title grad-text" lang="ar">قواعد الدوري</h1>
-      <p class="rules-sub" lang="ar">إزاي بتتحسب النقاط، وتنظيم البطولة من الأول لآخر.</p>
+    <section class="rules-hero" data-rules>
+      <div class="rules-badge" lang="ar">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2l2.6 5.6 6.1.8-4.4 4.2 1 6.1L12 16l-5.3 2.7 1-6.1L3.3 8.4l6.1-.8z"/></svg>
+        <span lang="ar">الدليل الرسمي</span>
+      </div>
+      <h1 class="rules-title grad-flow" lang="ar">قواعد الدوري</h1>
+      <p class="rules-sub" lang="ar">إزاي بتتحسب النقاط، وتنظيم البطولة من الأول لآخر — كل اللي محتاج تعرفه في صفحة واحدة.</p>
     </section>
 
-    <div class="panel rules-grid">
-      <div class="rule-block">
-        <h2 lang="ar">شكل البطولة</h2>
-        <ul class="rule-list" lang="ar">
-          <li>الدورة فيها <strong>6 فرق</strong> (كل فريق من اتنين بيلعبوا مع بعض).</li>
-          <li><strong>الكل بيلعب مع الكل</strong> — كل فريق بيواجه باقي الفرق مرة واحدة.</li>
-          <li>نظام نقطة واحد للجميع على مدار الموسم.</li>
-        </ul>
-      </div>
+    <div class="rules-stage">
 
-      <div class="rule-block">
-        <h2 lang="ar">حساب النقاط حسب المركز</h2>
-        <div class="points-scale">
-          <div class="ps-row"><span class="ps-place">الأول</span><span class="ps-dots"></span><span class="ps-pts">5 نقاط</span></div>
-          <div class="ps-row"><span class="ps-place">الثاني</span><span class="ps-dots"></span><span class="ps-pts">4 نقاط</span></div>
-          <div class="ps-row"><span class="ps-place">الثالث</span><span class="ps-dots"></span><span class="ps-pts">3 نقاط</span></div>
-          <div class="ps-row"><span class="ps-place">الرابع</span><span class="ps-dots"></span><span class="ps-pts">2 نقطة</span></div>
-          <div class="ps-row"><span class="ps-place">الخامس</span><span class="ps-dots"></span><span class="ps-pts">1 نقطة</span></div>
-          <div class="ps-row"><span class="ps-place">السادس</span><span class="ps-dots"></span><span class="ps-pts">0 نقاط</span></div>
+      <section class="rule-card rule-card--format" data-rules>
+        <div class="rule-card-head">
+          <span class="rule-ico rule-ico--viol">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v18M4.5 7l15 10M19.5 7l-15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="2.4" fill="currentColor"/></svg>
+          </span>
+          <div>
+            <span class="rule-kicker" lang="ar">الشكل</span>
+            <h2 class="rule-title" lang="ar">شكل البطولة</h2>
+          </div>
         </div>
-      </div>
-
-      <div class="rule-block">
-        <h2 lang="ar">مواعيد البطولة</h2>
         <ul class="rule-list" lang="ar">
-          <li>الدورات بتتقام يوم <strong>الثلاثاء</strong> ويوم <strong>الجمعة</strong>.</li>
-          <li>من <strong>9 مساءً</strong> لحد <strong>12 منتصف الليل</strong>.</li>
+          <li>الدورة فيها <strong>6 فرق</strong> — كل فريق من اتنين بيلعبوا مع بعض.</li>
+          <li><strong>الكل بيلعب مع الكل</strong> — كل فريق بيواجه باقي الفرق مرة واحدة.</li>
+          <li>نظام نقطة <strong>واحد للجميع</strong> على مدار الموسم كله.</li>
         </ul>
-      </div>
+      </section>
+
+      <section class="rule-card rule-card--points" data-rules>
+        <div class="rule-card-head">
+          <span class="rule-ico rule-ico--gold">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2l2.6 5.6 6.1.8-4.4 4.2 1 6.1L12 16l-5.3 2.7 1-6.1L3.3 8.4l6.1-.8z"/></svg>
+          </span>
+          <div>
+            <span class="rule-kicker" lang="ar">النقاط</span>
+            <h2 class="rule-title" lang="ar">النقاط حسب المركز</h2>
+          </div>
+        </div>
+        <div class="pts-scale">
+          <div class="pts-row pts-row--1">
+            <span class="pts-place">المركز 1</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:100%"></i></span>
+            <span class="pts-val">5</span>
+          </div>
+          <div class="pts-row pts-row--2">
+            <span class="pts-place">المركز 2</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:80%"></i></span>
+            <span class="pts-val">4</span>
+          </div>
+          <div class="pts-row pts-row--3">
+            <span class="pts-place">المركز 3</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:60%"></i></span>
+            <span class="pts-val">3</span>
+          </div>
+          <div class="pts-row pts-row--4">
+            <span class="pts-place">المركز 4</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:40%"></i></span>
+            <span class="pts-val">2</span>
+          </div>
+          <div class="pts-row pts-row--5">
+            <span class="pts-place">المركز 5</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:20%"></i></span>
+            <span class="pts-val">1</span>
+          </div>
+          <div class="pts-row pts-row--0">
+            <span class="pts-place">المركز 6</span>
+            <span class="pts-bar"><i class="pts-fill" style="--w:0%"></i></span>
+            <span class="pts-val">0</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="rule-card rule-card--when" data-rules>
+        <div class="rule-card-head">
+          <span class="rule-ico rule-ico--silv">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <div>
+            <span class="rule-kicker" lang="ar">المواعيد</span>
+            <h2 class="rule-title" lang="ar">مواعيد البطولة</h2>
+          </div>
+        </div>
+        <div class="day-tags" lang="ar">
+          <span class="day-tag day-tag--tue"><b>ثلاثاء</b><i>الدورة الأولى</i></span>
+          <span class="day-tag day-tag--fri"><b>جمعة</b><i>الدورة الثانية</i></span>
+        </div>
+        <div class="time-chip" lang="ar">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          من 9 مساءً حتى 12 منتصف الليل
+        </div>
+      </section>
+
     </div>
 
-    <div class="table-foot">
-      <span class="live-dot"></span>
-      <span lang="ar">يعيش، يتنفس، اتنين على اتنين.</span>
-      <a class="admin-link" href="/" lang="ar">عرض الترتيب</a>
+    <div class="rules-cta" data-rules>
+      <span class="rules-cta-glow"></span>
+      <p lang="ar">يعيش، يتنفس، <strong>اتنين على اتنين</strong>.</p>
+      <a class="btn-solid" href="/" lang="ar">عرض الترتيب ←</a>
     </div>
 
   </main>
@@ -89,6 +151,14 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    // stagger reveal on load
+    (function () {
+      var els = document.querySelectorAll("[data-rules]");
+      Array.prototype.forEach.call(els, function (el, i) {
+        el.style.setProperty("--d", (i * 0.12) + "s");
+      });
+    })();
   </script>
 </body>
 </html>

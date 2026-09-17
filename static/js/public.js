@@ -158,12 +158,34 @@
 
   function renderStats() {
     var totalPoints = state.players.reduce(function (s, p) { return s + (p.points || 0); }, 0);
-    els.statPlayers.textContent = state.players.length;
-    els.statPoints.textContent = totalPoints;
+    animateValue(els.statPlayers, state.players.length, "players");
+    animateValue(els.statPoints, totalPoints, "points");
     els.statAvg.textContent = state.players.length
       ? Math.round(totalPoints / state.players.length)
       : "\u2014";
     els.statUpdated.textContent = shortDate(state.lastUpdated);
+  }
+
+  // Animated number counter (animates the first paint only; instant afterwards)
+  var statsFirst = { players: true, points: true };
+  function animateValue(el, target, key) {
+    if (!el) return;
+    if (statsFirst[key]) {
+      statsFirst[key] = false;
+      var from = 0;
+      var start = null;
+      var dur = 900;
+      function tick(ts) {
+        if (start === null) start = ts;
+        var p = Math.min(1, (ts - start) / dur);
+        p = 1 - Math.pow(1 - p, 3); // easeOutCubic
+        el.textContent = Math.round(from + (target - from) * p);
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = target;
+    }
   }
 
   function teamLabel(p) {
@@ -281,6 +303,15 @@
         '</tr>';
     }
     body.innerHTML = html;
+    // Staggered row entrance (only the first time, to avoid re-animating on polling)
+    if (!renderTable.didAnimate) {
+      renderTable.didAnimate = true;
+      var rows = body.querySelectorAll("tr");
+      Array.prototype.forEach.call(rows, function (r, idx) {
+        r.style.animationDelay = Math.min(idx * 0.045, 0.9) + "s";
+        r.classList.add("row-in");
+      });
+    }
     bindShareButtons();
   }
 
