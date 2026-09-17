@@ -92,12 +92,17 @@ if not ADMIN_PASSWORD_HASH and config.get("ADMIN_PASSWORD"):
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-# Longer-lived caching for static assets (fonts, css, js), refreshed on deploys
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 86400  # 1 day
-
 
 @app.after_request
-def add_security_headers(response):
+def add_cache_and_security_headers(response):
+    # Static assets are content-hashed via ?v= in the templates, so they can
+    # be cached long; versioned URLs change whenever the file changes.
+    if request.path.startswith("/static/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=2592000")
+    # HTML pages must never be cached: otherwise browsers keep running old
+    # JavaScript that was written for elements that no longer exist.
+    else:
+        response.headers["Cache-Control"] = "no-store, max-age=0"
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
