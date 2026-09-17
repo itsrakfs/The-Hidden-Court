@@ -4,7 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b0714" />
+  <meta name="description" content="The Hidden Court — تصنيف دوري البادل. تابع ترتيب اللاعبين والنقاط لحظة بلحظة." />
+  <meta name="robots" content="index, follow" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="The Hidden Court" />
+  <meta property="og:title" content="THE HIDDEN COURT · PADEL RANKING" />
+  <meta property="og:description" content="أحدث تصنيف للاعبي البادل — تابع النقاط والترتيب مباشرة." />
+  <meta property="og:locale" content="ar_EG" />
+
   <title>THE HIDDEN COURT · PADEL RANKING</title>
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("thc-theme"); } catch (e) {}
+      if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -26,11 +42,23 @@
   <main class="page">
 
     <header class="hero">
+      <div class="top-bar">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="تبديل الوضع الليلي/النهاري">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+            <path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+            <path fill="currentColor" d="M20.4 14.2A8.5 8.5 0 0 1 9.8 3.6a.6.6 0 0 0-.75-.74A9 9 0 1 0 21.1 14.95a.6.6 0 0 0-.7-.75z"/>
+          </svg>
+        </button>
+      </div>
       <div class="logo-row">
         <div class="logo-mark">
           <svg viewBox="0 0 48 48" aria-hidden="true">
             <rect x="2" y="2" width="44" height="44" rx="11" fill="none" stroke="url(#lg)" stroke-width="2.2"/>
             <path d="M16 12v24M32 12v24M20 10L28 10M20 38l8 0" stroke="url(#lg)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="4.5" fill="url(#lg)" />
             <defs>
               <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stop-color="#c084fc"/>
@@ -59,7 +87,11 @@
           <span class="stat-label" lang="ar">إجمالي النقاط</span>
         </div>
         <div class="stat-card">
-          <span class="stat-value" id="stat-updated">&nbsp;</span>
+          <span class="stat-value" id="stat-avg">&mdash;</span>
+          <span class="stat-label" lang="ar">متوسط النقاط</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value stat-value--sm" id="stat-updated">&nbsp;</span>
           <span class="stat-label" lang="ar">آخر تحديث</span>
         </div>
       </div>
@@ -84,6 +116,9 @@
             <option value="10">أفضل 10</option>
             <option value="20">أفضل 20</option>
           </select>
+          <select id="team-select" lang="ar" aria-label="فريق">
+            <option value="all" selected>كل الفرق</option>
+          </select>
         </div>
       </div>
     </section>
@@ -95,6 +130,7 @@
           <div class="pod-rank">2</div>
           <div class="pod-avatar" id="pod-2-avatar"></div>
           <div class="pod-name" id="pod-2-name">&mdash;</div>
+          <div class="pod-team" id="pod-2-team"></div>
           <div class="pod-points"><span id="pod-2-points">0</span> <small>pt</small></div>
         </article>
         <article class="podium-card pod-1">
@@ -106,12 +142,14 @@
           <div class="pod-rank">1</div>
           <div class="pod-avatar" id="pod-1-avatar"></div>
           <div class="pod-name" id="pod-1-name">&mdash;</div>
+          <div class="pod-team" id="pod-1-team"></div>
           <div class="pod-points"><span id="pod-1-points">0</span> <small>pt</small></div>
         </article>
         <article class="podium-card pod-3">
           <div class="pod-rank">3</div>
           <div class="pod-avatar" id="pod-3-avatar"></div>
           <div class="pod-name" id="pod-3-name">&mdash;</div>
+          <div class="pod-team" id="pod-3-team"></div>
           <div class="pod-points"><span id="pod-3-points">0</span> <small>pt</small></div>
         </article>
       </div>
@@ -127,7 +165,7 @@
                 <th class="th-rank">#</th>
                 <th class="th-player">اللاعب</th>
                 <th class="th-num">النقاط</th>
-                <th class="th-updated">آخر تحديث</th>
+                <th class="th-actions" aria-label="مشاركة"></th>
               </tr>
             </thead>
             <tbody id="ranking-body"></tbody>
@@ -145,6 +183,8 @@
     </section>
 
   </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <footer class="footer">
     <span class="footer-mark">HC</span>

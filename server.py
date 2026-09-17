@@ -89,6 +89,19 @@ if not ADMIN_PASSWORD_HASH and config.get("ADMIN_PASSWORD"):
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+# Longer-lived caching for static assets (fonts, css, js), refreshed on deploys
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 86400  # 1 day
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return response
+
+
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
@@ -108,10 +121,13 @@ def get_db():
 
 
 def migrate_players(conn):
-    """Rebuild the players table into the points-only schema if needed."""
+    """Rebuild the players table into the points+team schema if needed."""
     cols = {r["name"] for r in conn.execute("PRAGMA table_info(players)").fetchall()}
-    if "matches" not in cols and "points" in cols:
+    if "matches" not in cols and "points" in cols and "team" in cols:
         return  # already the new schema
+
+    # Intermediate state: points schema from an older version (no team yet)
+    had_points = "points" in cols and "team" not in cols
 
     conn.executescript(
         """
@@ -121,12 +137,13 @@ def migrate_players(conn):
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             name        TEXT NOT NULL,
             points      INTEGER NOT NULL DEFAULT 0,
+            team        TEXT NOT NULL DEFAULT '',
             created_at  TEXT NOT NULL,
             updated_at  TEXT NOT NULL
         );
 
-        INSERT INTO players (id, name, points, created_at, updated_at)
-            SELECT id, name, COALESCE(points, 0), created_at, updated_at
+        INSERT INTO players (id, name, points, team, created_at, updated_at)
+            SELECT id, name, COALESCE(points, 0), '', created_at, updated_at
             FROM players_old;
 
         DROP TABLE players_old;
@@ -142,6 +159,7 @@ def init_db():
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 name        TEXT NOT NULL,
                 points      INTEGER NOT NULL DEFAULT 0,
+                team        TEXT NOT NULL DEFAULT '',
                 created_at  TEXT NOT NULL,
                 updated_at  TEXT NOT NULL
             );
@@ -191,6 +209,8 @@ def fetch_ranking(conn):
                 "rank": i,
                 "name": row["name"],
                 "points": row["points"],
+                "team": row["team"],
+                "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
             }
         )
@@ -307,7 +327,9 @@ def validate_player(data):
     except (TypeError, ValueError):
         points = 0
 
-    return {"name": name, "points": points}, None
+    team = (data.get("team") or "").strip()[:40]
+
+    return {"name": name, "points": points, "team": team}, None
 
 
 @app.route("/api/players", methods=["POST"])
@@ -322,9 +344,9 @@ def api_add_player():
     ts = now_utc()
     with get_db() as conn:
         cursor = conn.execute(
-            """INSERT INTO players (name, points, created_at, updated_at)
-               VALUES (?, ?, ?, ?)""",
-            (payload["name"], payload["points"], ts, ts),
+            """INSERT INTO players (name, points, team, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (payload["name"], payload["points"], payload["team"], ts, ts),
         )
         new_id = cursor.lastrowid
         return jsonify(fetch_ranking(conn) | {"created_id": new_id}), 201
@@ -347,9 +369,9 @@ def api_update_player(player_id):
         ts = now_utc()
         conn.execute(
             """UPDATE players
-               SET name = ?, points = ?, updated_at = ?
+               SET name = ?, points = ?, team = ?, updated_at = ?
                WHERE id = ?""",
-            (payload["name"], payload["points"], ts, player_id),
+            (payload["name"], payload["points"], payload["team"], ts, player_id),
         )
         return jsonify(fetch_ranking(conn))
 

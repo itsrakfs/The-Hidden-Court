@@ -157,6 +157,7 @@
               <tr>
                 <th class="th-rank">#</th>
                 <th class="th-player">اللاعب</th>
+                <th class="th-team">الفريق</th>
                 <th class="th-num">النقاط</th>
                 <th class="th-actions"></th>
               </tr>
@@ -192,6 +193,11 @@
         <div class="field">
           <label for="pf-points" lang="ar">النقاط *</label>
           <input id="pf-points" type="number" min="0" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label for="pf-team" lang="ar">الفريق (اختياري)</label>
+          <input id="pf-team" type="text" lang="ar" maxlength="40" placeholder="مثال: Rising Stars" />
+          <small class="field-hint" lang="ar">لو سيبتها فاضية هتظهر من غير فريق</small>
         </div>
         <p class="login-error" id="pf-error" hidden lang="ar"></p>
         <div class="modal-actions">

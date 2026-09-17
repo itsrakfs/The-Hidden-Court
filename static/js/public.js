@@ -1,4 +1,4 @@
-/* THE HIDDEN COURT · PADEL RANKING — public page logic v2 */
+/* THE HIDDEN COURT · PADEL RANKING — public page logic v3 */
 
 (function () {
   "use strict";
@@ -9,11 +9,13 @@
     search: "",
     sort: "rank",
     filter: "all",
+    team: "all",
   };
 
   var els = {};
   var refreshTimer = null;
   var pollIntervalMs = 15000;
+  var NEW_DAYS = 7;
 
   // ------------------------------------------------------------------ utils
   function $(id) { return document.getElementById(id); }
@@ -53,6 +55,13 @@
       " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
+  function isNew(p) {
+    if (!p.created_at) return false;
+    var d = new Date(p.created_at);
+    if (isNaN(d.getTime())) return false;
+    return (Date.now() - d.getTime()) < NEW_DAYS * 24 * 60 * 60 * 1000;
+  }
+
   // ------------------------------------------------------------------ fetch
   function fetchRanking(isAuto) {
     fetch("/api/ranking", { cache: "no-store" })
@@ -63,14 +72,15 @@
       .then(function (data) {
         var changed =
           JSON.stringify(data.players.map(function (p) {
-            return [p.id, p.name, p.points, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.updated_at];
           })) !==
           JSON.stringify(state.players.map(function (p) {
-            return [p.id, p.name, p.points, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.updated_at];
           }));
 
         state.players = data.players || [];
         state.lastUpdated = data.last_updated || null;
+        populateTeams();
         render();
 
         var foot = els.footStatus;
@@ -91,6 +101,32 @@
       });
   }
 
+  // -------------------------------------------------------- team select fill
+  function populateTeams() {
+    var sel = els.teamSelect;
+    if (!sel) return;
+    var teams = [];
+    state.players.forEach(function (p) {
+      var t = (p.team || "").trim();
+      if (t && teams.indexOf(t) === -1) teams.push(t);
+    });
+    teams.sort();
+
+    var cur = state.team;
+    if (teams.indexOf(cur) === -1) cur = "all";
+
+    var html = '<option value="all">\u0643\u0644 \u0627\u0644\u0641\u0631\u0642</option>';
+    teams.forEach(function (t) {
+      html += '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+    });
+
+    if (sel.innerHTML !== html) {
+      sel.innerHTML = html;
+      sel.value = cur;
+      state.team = cur;
+    }
+  }
+
   // ------------------------------------------------------------- filtering
   function getVisiblePlayers() {
     var q = state.search.trim().toLowerCase();
@@ -100,20 +136,15 @@
       list = list.filter(function (p) { return p.name.toLowerCase().indexOf(q) !== -1; });
     }
 
+    if (state.team !== "all") {
+      list = list.filter(function (p) { return (p.team || "") === state.team; });
+    }
+
     if (state.filter !== "all") {
       var limit = parseInt(state.filter, 10);
       list = list.filter(function (p) { return p.rank <= limit; });
     }
 
-    return list;
-  }
-
-  function sortList(list) {
-    if (state.sort === "points") {
-      list.sort(function (a, b) { return b.points - a.points; });
-    } else {
-      list.sort(function (a, b) { return a.rank - b.rank; });
-    }
     return list;
   }
 
@@ -126,9 +157,18 @@
   }
 
   function renderStats() {
+    var totalPoints = state.players.reduce(function (s, p) { return s + (p.points || 0); }, 0);
     els.statPlayers.textContent = state.players.length;
-    els.statPoints.textContent = state.players.reduce(function (s, p) { return s + (p.points || 0); }, 0);
+    els.statPoints.textContent = totalPoints;
+    els.statAvg.textContent = state.players.length
+      ? Math.round(totalPoints / state.players.length)
+      : "\u2014";
     els.statUpdated.textContent = shortDate(state.lastUpdated);
+  }
+
+  function teamLabel(p) {
+    var t = (p.team || "").trim();
+    return t ? '<span class="team-tag">' + escapeHtml(t) + '</span>' : "";
   }
 
   function renderPodium(top3) {
@@ -168,6 +208,9 @@
       els["pod" + r + "Name"].textContent = p.name;
       els["pod" + r + "Points"].textContent = p.points;
       els["pod" + r + "Avatar"].textContent = initials(p.name);
+
+      var team = els["pod" + r + "Team"];
+      if (team) team.textContent = (p.team || "").trim() || "";
     });
 
     // Reveal the podium after cards are placed, so the stagger reads nicely.
@@ -192,17 +235,85 @@
     for (var i = 0; i < list.length; i++) {
       var p = list[i];
       html +=
-        '<tr>' +
+        '<tr data-player-id="' + p.id + '">' +
           '<td class="th-rank"><span class="num">' + p.rank + '</span></td>' +
           '<td class="th-player"><div class="player-cell">' +
             '<span class="initials">' + escapeHtml(initials(p.name)) + '</span>' +
-            '<span>' + escapeHtml(p.name) + '</span>' +
+            '<span class="player-name-cell">' +
+              escapeHtml(p.name) +
+              (isNew(p) ? '<span class="new-badge">\u062c\u062f\u064a\u062f</span>' : "") +
+            '</span>' +
+            teamLabel(p) +
           '</div></td>' +
-          '<td class="th-num"><span class="num">' + p.points + '</span></td>' +
-          '<td class="th-updated"><span class="updated-cell">' + formatDate(p.updated_at) + '</span></td>' +
+          '<td class="th-num"><span class="num">' + p.points + '</span> ' +
+            '<span class="points-label">pt</span></td>' +
+          '<td class="th-actions"><div class="row-actions">' +
+            '<button class="share-btn" type="button" data-id="' + p.id + '" data-name="' + escapeHtml(p.name) + '" aria-label="\u0645\u0634\u0627\u0631\u0643\u0629">' +
+              '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="2"/></svg>' +
+            '</button>' +
+          '</div></td>' +
         '</tr>';
     }
     body.innerHTML = html;
+    bindShareButtons();
+  }
+
+  // --------------------------------------------------------------- sharing
+  function bindShareButtons() {
+    var btns = document.querySelectorAll(".share-btn");
+    Array.prototype.forEach.call(btns, function (btn) {
+      btn.onclick = function () {
+        var id = btn.getAttribute("data-id");
+        var name = btn.getAttribute("data-name");
+        var url = location.origin + location.pathname + "#player=" + id;
+        sharePlayer(url, name);
+      };
+    });
+  }
+
+  function sharePlayer(url, name) {
+    if (navigator.share) {
+      navigator.share({ title: "The Hidden Court", text: name + " \u2014 \u0627\u0644\u0645\u0648\u0642\u0639", url: url })
+        .catch(function () {});
+      return;
+    }
+    copyToClipboard(url);
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast("\u062a\u0645 \u0646\u0633\u062e \u0627\u0644\u0631\u0627\u0628\u0637");
+      }).catch(function () { showToast("\u062a\u0645 \u062a\u062c\u0647\u064a\u0632 \u0627\u0644\u0631\u0627\u0628\u0637"); });
+    } else {
+      showToast(location.origin + location.pathname + "#player=" + currentHashPlayer());
+    }
+  }
+
+  function currentHashPlayer() {
+    var m = location.hash.match(/player=(\d+)/);
+    return m ? m[1] : "";
+  }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    var el = els.toast;
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2200);
+  }
+
+  function highlightPlayer() {
+    var m = location.hash.match(/player=(\d+)/);
+    if (!m) return;
+    var id = parseInt(m[1], 10);
+    var row = document.querySelector('tr[data-player-id="' + id + '"]');
+    if (!row) return;
+    row.classList.add("highlight-row");
+    setTimeout(function () { row.classList.remove("highlight-row"); }, 4000);
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   // ------------------------------------------------------------ controls
@@ -217,9 +328,21 @@
       render();
     });
 
+    els.teamSelect.addEventListener("change", function (e) {
+      state.team = e.target.value;
+      render();
+    });
+
     els.sortSelect.addEventListener("change", function (e) {
       state.sort = e.target.value;
       render();
+    });
+
+    els.themeToggle.addEventListener("click", function () {
+      var root = document.documentElement;
+      var dark = root.getAttribute("data-theme") !== "light";
+      root.setAttribute("data-theme", dark ? "light" : "dark");
+      try { localStorage.setItem("thc-theme", dark ? "light" : "dark"); } catch (e) {}
     });
   }
 
@@ -228,18 +351,22 @@
     els = {
       statPlayers: $("stat-players"),
       statPoints: $("stat-points"),
+      statAvg: $("stat-avg"),
       statUpdated: $("stat-updated"),
       podiumSection: $("podium-section"),
       podium: $("podium"),
       search: $("search-input"),
       sortSelect: $("sort-select"),
       filter: $("filter-select"),
+      teamSelect: $("team-select"),
       rankingBody: $("ranking-body"),
       emptyState: $("empty-state"),
       footStatus: $("foot-status"),
-      pod1Name: $("pod-1-name"), pod1Points: $("pod-1-points"), pod1Avatar: $("pod-1-avatar"),
-      pod2Name: $("pod-2-name"), pod2Points: $("pod-2-points"), pod2Avatar: $("pod-2-avatar"),
-      pod3Name: $("pod-3-name"), pod3Points: $("pod-3-points"), pod3Avatar: $("pod-3-avatar"),
+      themeToggle: $("theme-toggle"),
+      toast: $("toast"),
+      pod1Name: $("pod-1-name"), pod1Points: $("pod-1-points"), pod1Avatar: $("pod-1-avatar"), pod1Team: $("pod-1-team"),
+      pod2Name: $("pod-2-name"), pod2Points: $("pod-2-points"), pod2Avatar: $("pod-2-avatar"), pod2Team: $("pod-2-team"),
+      pod3Name: $("pod-3-name"), pod3Points: $("pod-3-points"), pod3Avatar: $("pod-3-avatar"), pod3Team: $("pod-3-team"),
     };
 
     var yr = $("year");
@@ -247,12 +374,24 @@
 
     bindControls();
     fetchRanking(false);
+    highlightPlayer();
+
+    window.addEventListener("hashchange", highlightPlayer);
 
     refreshTimer = setInterval(function () { fetchRanking(true); }, pollIntervalMs);
 
     document.addEventListener("visibilitychange", function () {
       if (!document.hidden) fetchRanking(true);
     });
+  }
+
+  function sortList(list) {
+    if (state.sort === "points") {
+      list.sort(function (a, b) { return b.points - a.points; });
+    } else {
+      list.sort(function (a, b) { return a.rank - b.rank; });
+    }
+    return list;
   }
 
   if (document.readyState === "loading") {

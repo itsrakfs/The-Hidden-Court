@@ -207,6 +207,7 @@
         '<td class="th-rank">' + p.rank + "</td>" +
         '<td class="th-player"><div class="name-cell"><span class="initials">' + escapeHtml(initials(p.name)) +
         "</span><span>" + escapeHtml(p.name) + "</span></div></td>" +
+        '<td class="th-team">' + (p.team ? '<span class="team-tag">' + escapeHtml(p.team) + "</span>" : "<span class=\"muted\">\u2014</span>") + "</td>" +
         '<td class="th-num">' + p.points + "</td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="icon-btn" data-action="edit" title="Edit"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 3l4 4L8 20H4v-4L17 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>' +
@@ -222,6 +223,7 @@
       '<tr data-id="' + p.id + '">' +
         '<td class="th-rank">' + p.rank + "</td>" +
         '<td class="th-player"><input class="name-input" data-field="name" value="' + escapeHtml(p.name) + '" /></td>' +
+        '<td class="th-team"><input class="name-input" data-field="team" maxlength="40" value="' + escapeHtml(p.team || "") + '" placeholder="\u0641\u0631\u064a\u0642" /></td>' +
         '<td class="th-num"><input class="text-input" type="number" min="0" data-field="points" value="' + p.points + '" /></td>' +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="btn btn-primary inline-save" data-action="save" ' + (saving ? "disabled" : "") + ">" +
@@ -263,14 +265,20 @@
     }
   }
 
-  // live re-render from an edited row (keeps win rate / rank fresh after save)
+  // live re-render from an edited row
   function collectRow(tr) {
     var inputs = tr.querySelectorAll("[data-field]");
     var data = {};
     Array.prototype.forEach.call(inputs, function (inp) {
-      var val = parseInt(inp.value, 10);
-      data[inp.dataset.field] =
-        inp.dataset.field === "name" ? inp.value.trim() : (isNaN(val) ? 0 : Math.max(0, val));
+      var field = inp.dataset.field;
+      if (field === "name") {
+        data.name = inp.value.trim();
+      } else if (field === "team") {
+        data.team = inp.value.trim();
+      } else {
+        var val = parseInt(inp.value, 10);
+        data[field] = isNaN(val) ? 0 : Math.max(0, val);
+      }
     });
     return data;
   }
@@ -340,6 +348,7 @@
     var data = {
       name: els.pfName.value.trim(),
       points: parseInt(els.pfPoints.value, 10) || 0,
+      team: els.pfTeam.value.trim(),
     };
 
     if (!data.name) {
@@ -435,6 +444,7 @@
       pfId: $("pf-id"),
       pfName: $("pf-name"),
       pfPoints: $("pf-points"),
+      pfTeam: $("pf-team"),
       pfError: $("pf-error"),
       pfSubmit: $("pf-submit"),
 
