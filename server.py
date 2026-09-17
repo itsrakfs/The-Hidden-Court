@@ -123,34 +123,44 @@ def get_db():
 
 
 def migrate_players(conn):
-    """Rebuild the players table into the points+team schema if needed."""
+    """Migrate the players table to the newest schema if needed."""
     cols = {r["name"] for r in conn.execute("PRAGMA table_info(players)").fetchall()}
-    if "matches" not in cols and "points" in cols and "team" in cols:
-        return  # already the new schema
 
-    # Intermediate state: points schema from an older version (no team yet)
-    had_points = "points" in cols and "team" not in cols
+    if "matches" in cols:
+        # Legacy 'matches' schema → full rebuild into the current one
+        conn.executescript(
+            """
+            ALTER TABLE players RENAME TO players_old;
 
-    conn.executescript(
-        """
-        ALTER TABLE players RENAME TO players_old;
+            CREATE TABLE players (
+                id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                name                TEXT NOT NULL,
+                points              INTEGER NOT NULL DEFAULT 0,
+                team                TEXT NOT NULL DEFAULT '',
+                created_at          TEXT NOT NULL,
+                updated_at          TEXT NOT NULL,
+                points_changed_at   TEXT NOT NULL DEFAULT '',
+                points_direction    INTEGER NOT NULL DEFAULT 0
+            );
 
-        CREATE TABLE players (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            name        TEXT NOT NULL,
-            points      INTEGER NOT NULL DEFAULT 0,
-            team        TEXT NOT NULL DEFAULT '',
-            created_at  TEXT NOT NULL,
-            updated_at  TEXT NOT NULL
-        );
+            INSERT INTO players (id, name, points, team, created_at, updated_at)
+                SELECT id, name, COALESCE(points, 0), '', created_at, updated_at
+                FROM players_old;
 
-        INSERT INTO players (id, name, points, team, created_at, updated_at)
-            SELECT id, name, COALESCE(points, 0), '', created_at, updated_at
-            FROM players_old;
+            DROP TABLE players_old;
+            """
+        )
+        return
 
-        DROP TABLE players_old;
-        """
-    )
+    # Partial upgrades: add any missing column (idempotent, no data loss)
+    if "points" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN points INTEGER NOT NULL DEFAULT 0")
+    if "team" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN team TEXT NOT NULL DEFAULT ''")
+    if "points_changed_at" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN points_changed_at TEXT NOT NULL DEFAULT ''")
+    if "points_direction" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN points_direction INTEGER NOT NULL DEFAULT 0")
 
 
 def restore_from_seed(conn):
@@ -182,10 +192,17 @@ def restore_from_seed(conn):
         team = (entry.get("team") or "").strip()[:40]
         created = entry.get("created_at") or now_utc()
         updated = entry.get("updated_at") or created
+        changed = entry.get("points_changed_at") or ""
+        direction = entry.get("points_direction") or 0
+        try:
+            direction = max(-1, min(1, int(direction)))
+        except (TypeError, ValueError):
+            direction = 0
         conn.execute(
-            """INSERT INTO players (name, points, team, created_at, updated_at)
-               VALUES (?, ?, ?, ?, ?)""",
-            (name, points, team, created, updated),
+            """INSERT INTO players
+                   (name, points, team, created_at, updated_at, points_changed_at, points_direction)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (name, points, team, created, updated, changed, direction),
         )
         seeded += 1
     return seeded > 0
@@ -196,12 +213,14 @@ def init_db():
         conn.executescript(
             """
             CREATE TABLE IF NOT EXISTS players (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                name        TEXT NOT NULL,
-                points      INTEGER NOT NULL DEFAULT 0,
-                team        TEXT NOT NULL DEFAULT '',
-                created_at  TEXT NOT NULL,
-                updated_at  TEXT NOT NULL
+                id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                name                TEXT NOT NULL,
+                points              INTEGER NOT NULL DEFAULT 0,
+                team                TEXT NOT NULL DEFAULT '',
+                created_at          TEXT NOT NULL,
+                updated_at          TEXT NOT NULL,
+                points_changed_at   TEXT NOT NULL DEFAULT '',
+                points_direction    INTEGER NOT NULL DEFAULT 0
             );
             CREATE TABLE IF NOT EXISTS admins (
                 id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -234,6 +253,29 @@ def now_utc():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+TREND_WINDOW_SECONDS = 3 * 24 * 60 * 60  # arrows stay visible for 3 days
+
+
+def trend_for(row):
+    """Return 'up', 'down' or '' based on the last points change.
+
+    An indicator (up/down arrow) is shown for TREND_WINDOW_SECONDS after the
+    points of a player changed; past that window it disappears.
+    """
+    direction = row["points_direction"]
+    changed_at = row["points_changed_at"]
+    if not direction or not changed_at:
+        return ""
+    try:
+        changed = datetime.fromisoformat(changed_at)
+        age = (datetime.now(timezone.utc) - changed).total_seconds()
+    except (TypeError, ValueError):
+        return ""
+    if age < 0 or age > TREND_WINDOW_SECONDS:
+        return ""
+    return "up" if direction > 0 else "down"
+
+
 def fetch_ranking(conn):
     """Return players sorted by points desc -> name, with rank."""
     rows = conn.execute(
@@ -253,6 +295,7 @@ def fetch_ranking(conn):
                 "team": row["team"],
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
+                "trend": trend_for(row),
             }
         )
         if last_updated is None or row["updated_at"] > last_updated:
@@ -408,11 +451,31 @@ def api_update_player(player_id):
             return jsonify({"error": "Player not found"}), 404
 
         ts = now_utc()
+        old_points = row["points"]
+        new_points = payload["points"]
+        changed_at = row["points_changed_at"]
+        direction = row["points_direction"]
+
+        if new_points != old_points:
+            # Record the direction/time of the points change; the frontend
+            # shows an up/down arrow for the following 3 days.
+            changed_at = ts
+            direction = 1 if new_points > old_points else -1
+
         conn.execute(
             """UPDATE players
-               SET name = ?, points = ?, team = ?, updated_at = ?
+               SET name = ?, points = ?, team = ?, updated_at = ?,
+                   points_changed_at = ?, points_direction = ?
                WHERE id = ?""",
-            (payload["name"], payload["points"], payload["team"], ts, player_id),
+            (
+                payload["name"],
+                new_points,
+                payload["team"],
+                ts,
+                changed_at,
+                direction,
+                player_id,
+            ),
         )
         return jsonify(fetch_ranking(conn))
 
@@ -441,7 +504,8 @@ def api_backup():
 
     with get_db() as conn:
         rows = conn.execute(
-            """SELECT name, points, team, created_at, updated_at
+            """SELECT name, points, team, created_at, updated_at,
+                      points_changed_at, points_direction
                FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""
         ).fetchall()
     payload = {"players": [dict(r) for r in rows]}

@@ -171,6 +171,12 @@
     return t ? '<span class="team-tag">' + escapeHtml(t) + '</span>' : "";
   }
 
+  function trendHtml(trend) {
+    if (trend === "up") return '<span class="trend trend-up" title="\u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u0646\u0642\u0627\u0637">\u25b4</span>';
+    if (trend === "down") return '<span class="trend trend-down" title="\u0627\u0646\u062e\u0641\u0627\u0636 \u0627\u0644\u0646\u0642\u0627\u0637">\u25be</span>';
+    return "";
+  }
+
   function renderPodium(top3) {
     var podiumSection = els.podiumSection;
     var hasTop = top3.length > 0;
@@ -198,6 +204,8 @@
         els["pod" + r + "Name"].textContent = "\u2014";
         els["pod" + r + "Points"].textContent = "0";
         els["pod" + r + "Avatar"].textContent = "?";
+        var t = els["pod" + r + "Trend"];
+        if (t) { t.textContent = ""; t.className = "trend"; }
         return;
       }
       if (card) {
@@ -211,6 +219,12 @@
 
       var team = els["pod" + r + "Team"];
       if (team) team.textContent = (p.team || "").trim() || "";
+
+      var trend = els["pod" + r + "Trend"];
+      if (trend) {
+        trend.textContent = p.trend === "up" ? "\u25b4" : p.trend === "down" ? "\u25be" : "";
+        trend.className = "trend" + (p.trend === "up" ? " trend-up" : p.trend === "down" ? " trend-down" : "");
+      }
     });
 
     // Reveal the podium after cards are placed, so the stagger reads nicely.
@@ -246,7 +260,8 @@
             teamLabel(p) +
           '</div></td>' +
           '<td class="th-num"><span class="num">' + p.points + '</span> ' +
-            '<span class="points-label">pt</span></td>' +
+            '<span class="points-label">pt</span> ' +
+            trendHtml(p.trend) + '</td>' +
           '<td class="th-actions"><div class="row-actions">' +
             '<button class="share-btn" type="button" data-id="' + p.id + '" data-name="' + escapeHtml(p.name) + '" aria-label="\u0645\u0634\u0627\u0631\u0643\u0629">' +
               '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="18" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="2"/></svg>' +
@@ -337,13 +352,6 @@
       state.sort = e.target.value;
       render();
     });
-
-    els.themeToggle.addEventListener("click", function () {
-      var root = document.documentElement;
-      var dark = root.getAttribute("data-theme") !== "light";
-      root.setAttribute("data-theme", dark ? "light" : "dark");
-      try { localStorage.setItem("thc-theme", dark ? "light" : "dark"); } catch (e) {}
-    });
   }
 
   // ------------------------------------------------------------------- init
@@ -362,11 +370,10 @@
       rankingBody: $("ranking-body"),
       emptyState: $("empty-state"),
       footStatus: $("foot-status"),
-      themeToggle: $("theme-toggle"),
       toast: $("toast"),
-      pod1Name: $("pod-1-name"), pod1Points: $("pod-1-points"), pod1Avatar: $("pod-1-avatar"), pod1Team: $("pod-1-team"),
-      pod2Name: $("pod-2-name"), pod2Points: $("pod-2-points"), pod2Avatar: $("pod-2-avatar"), pod2Team: $("pod-2-team"),
-      pod3Name: $("pod-3-name"), pod3Points: $("pod-3-points"), pod3Avatar: $("pod-3-avatar"), pod3Team: $("pod-3-team"),
+      pod1Name: $("pod-1-name"), pod1Points: $("pod-1-points"), pod1Avatar: $("pod-1-avatar"), pod1Team: $("pod-1-team"), pod1Trend: $("pod-1-trend"),
+      pod2Name: $("pod-2-name"), pod2Points: $("pod-2-points"), pod2Avatar: $("pod-2-avatar"), pod2Team: $("pod-2-team"), pod2Trend: $("pod-2-trend"),
+      pod3Name: $("pod-3-name"), pod3Points: $("pod-3-points"), pod3Avatar: $("pod-3-avatar"), pod3Team: $("pod-3-team"), pod3Trend: $("pod-3-trend"),
     };
 
     var yr = $("year");
