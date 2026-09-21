@@ -182,6 +182,10 @@ def migrate_players(conn):
         conn.execute("ALTER TABLE players ADD COLUMN streak_peak INTEGER NOT NULL DEFAULT 0")
     if "is_mvp" not in cols:
         conn.execute("ALTER TABLE players ADD COLUMN is_mvp INTEGER NOT NULL DEFAULT 0")
+    if "mvp_count" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN mvp_count INTEGER NOT NULL DEFAULT 0")
+    if "tournaments" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN tournaments INTEGER NOT NULL DEFAULT 0")
 
 
 def restore_from_seed(conn):
@@ -224,6 +228,14 @@ def restore_from_seed(conn):
             is_mvp = 1 if int(entry.get("is_mvp", 0)) else 0
         except (TypeError, ValueError):
             is_mvp = 0
+        try:
+            mvp_count = max(0, int(entry.get("mvp_count", 0)))
+        except (TypeError, ValueError):
+            mvp_count = 0
+        try:
+            tournaments = max(0, int(entry.get("tournaments", 0)))
+        except (TypeError, ValueError):
+            tournaments = 0
         created = entry.get("created_at") or now_utc()
         updated = entry.get("updated_at") or created
         changed = entry.get("points_changed_at") or ""
@@ -235,9 +247,11 @@ def restore_from_seed(conn):
         cur = conn.execute(
             """INSERT INTO players
                    (name, points, team, image, streak, streak_peak, is_mvp,
+                    mvp_count, tournaments,
                     created_at, updated_at, points_changed_at, points_direction)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (name, points, team, image, streak, streak_peak, is_mvp, created, updated, changed, direction),
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (name, points, team, image, streak, streak_peak, is_mvp,
+             mvp_count, tournaments, created, updated, changed, direction),
         )
         player_id = cur.lastrowid
         seeded += 1
@@ -370,6 +384,8 @@ def fetch_ranking(conn):
                 "streak": row["streak"],
                 "streak_peak": row["streak_peak"],
                 "is_mvp": bool(row["is_mvp"]),
+                "mvp_count": row["mvp_count"],
+                "tournaments": row["tournaments"],
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
                 "trend": trend_for(row),
@@ -651,6 +667,40 @@ def api_add_streak(player_id):
         return jsonify(fetch_ranking(conn))
 
 
+@app.route("/api/players/<int:player_id>/tournaments", methods=["POST"])
+@admin_required
+@csrf_required
+def api_add_tournaments(player_id):
+    """Manually bump a player's tournament trophies by +1 or -1 (admin buttons).
+
+    Unlike the "30 points = one tournament" statistic (derived on the fly from
+    the points total), this is the editable league title count. It never gets
+    lowered below zero and is preserved in backups/restores so a manual edit
+    is never lost on a redeploy.
+    """
+    data = request.get_json(silent=True) or {}
+    try:
+        delta = int(data.get("delta", 1))
+    except (TypeError, ValueError):
+        delta = 1
+    if delta == 0:
+        delta = 1
+    delta = 1 if delta > 0 else -1
+
+    with get_db() as conn:
+        row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        ts = now_utc()
+        new_tournaments = max(0, row["tournaments"] + delta)
+        conn.execute(
+            "UPDATE players SET tournaments = ?, updated_at = ? WHERE id = ?",
+            (new_tournaments, ts, player_id),
+        )
+        return jsonify(fetch_ranking(conn))
+
+
 @app.route("/api/players/<int:player_id>/mvp", methods=["POST"])
 @admin_required
 @csrf_required
@@ -668,10 +718,24 @@ def api_toggle_mvp(player_id):
                 (ts, player_id),
             )
         else:
+            # Crowning a new MVP: bump the lifetime counter and grant the
+            # +1 gift point defined in the rules (kept forever in history,
+            # never removed when the MVP flag is later turned off).
+            new_mvp_count = int(row["mvp_count"]) + 1
+            new_points = int(row["points"]) + 1
             conn.execute("UPDATE players SET is_mvp = 0")
             conn.execute(
-                "UPDATE players SET is_mvp = 1, updated_at = ? WHERE id = ?",
-                (ts, player_id),
+                """UPDATE players
+                   SET is_mvp = 1, mvp_count = ?, points = ?, updated_at = ?,
+                       points_changed_at = ?, points_direction = 1
+                   WHERE id = ?""",
+                (new_mvp_count, new_points, ts, ts, player_id),
+            )
+            conn.execute(
+                """INSERT INTO point_history
+                       (player_id, old_points, new_points, delta, created_at)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (player_id, row["points"], new_points, 1, ts),
             )
         return jsonify(fetch_ranking(conn))
 
@@ -702,6 +766,7 @@ def api_backup():
     with get_db() as conn:
         rows = conn.execute(
             """SELECT id, name, points, team, image, streak, streak_peak, is_mvp,
+                      mvp_count, tournaments,
                       created_at, updated_at,
                       points_changed_at, points_direction
                FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""

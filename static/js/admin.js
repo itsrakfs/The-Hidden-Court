@@ -246,6 +246,11 @@
         "</span><span>" + escapeHtml(p.name) + "</span></div></td>" +
         '<td class="th-team">' + (p.team ? '<span class="team-tag">' + escapeHtml(p.team) + "</span>" : "<span class=\"muted\">\u2014</span>") + "</td>" +
         '<td class="th-num">' + p.points + "</td>" +
+        '<td class="th-tournaments"><div class="trophy-ctl">' +
+          '<span class="trophy-num" title="\u0627\u0644\u0628\u0637\u0648\u0644\u0627\u062a">\ud83c\udfc6\u2009' + (p.tournaments || 0) + "</span>" +
+          '<button class="mini-btn" data-action="tournaments" data-delta="1" title="\u0628\u0637\u0648\u0644\u0629 \u062c\u062f\u064a\u062f\u0629">+</button>' +
+          '<button class="mini-btn" data-action="tournaments" data-delta="-1" title="\u0625\u0644\u063a\u0627\u0621 \u0628\u0637\u0648\u0644\u0629">\u2212</button>' +
+        "</div></td>" +
         '<td class="th-streak"><div class="streak-ctl">' +
           '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
           '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
@@ -254,6 +259,7 @@
         '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
+          (p.mvp_count ? '<span class="mvp-count">\u00d7' + p.mvp_count + "</span>" : "") +
         "</button></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="icon-btn" data-action="edit" title="Edit"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 3l4 4L8 20H4v-4L17 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>' +
@@ -278,6 +284,12 @@
           '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
           '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
           '<button class="mini-btn" data-action="streak" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
+        "</div></td>" +
+        '<!--B1-->' +
+        '<td class="th-tournaments"><div class="tournament-ctl" title="\u0627\u0644\u0628\u0637\u0648\u0644\u0627\u062a">' +
+          '<span class="tournament-num">\ud83c\udfc6\u2009' + (p.tournaments || 0) + "</span>" +
+          '<button class="mini-btn" data-action="tournaments" data-delta="1" title="+1">+</button>' +
+          '<button class="mini-btn" data-action="tournaments" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
         "</div></td>" +
         '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
