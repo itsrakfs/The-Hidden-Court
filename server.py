@@ -26,7 +26,18 @@ ENV_PATH = BASE_DIR / ".env"
 # DB_PATH can be overridden with an environment variable so the SQLite file can
 # live on a persistent Railway volume (survives redeploys). Falls back to the
 # project folder for local development.
-DB_PATH = Path(os.environ.get("DB_PATH") or (BASE_DIR / "players.db")).expanduser()
+def _resolve_db_path():
+    env = os.environ.get("DB_PATH", "").strip()
+    if env:
+        return Path(env).expanduser()
+    # Default Railway volume mount path: if a volume is attached the disk is
+    # persistent, so the database must live there (not in the repo folder).
+    if os.path.exists("/data"):
+        return Path("/data/players.db")
+    return BASE_DIR / "players.db"
+
+
+DB_PATH = _resolve_db_path()
 SEED_PATH = BASE_DIR / "seed_players.json"
 
 
