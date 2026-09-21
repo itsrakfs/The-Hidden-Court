@@ -363,6 +363,20 @@ body {
   color: var(--violet-1);
 }
 .kpi-small { font-size: 15px; color: var(--violet-2); word-break: break-word; }
+.btn-league {
+  margin-top: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(67, 240, 178, 0.16), rgba(124, 232, 255, 0.14));
+  border: 1px solid rgba(67, 240, 178, 0.35);
+  border-radius: 10px;
+  color: #43f0b2;
+}
+.btn-league:hover {
+  background: linear-gradient(135deg, rgba(67, 240, 178, 0.28), rgba(124, 232, 255, 0.24));
+  transform: translateY(-1px);
+}
 
 .admin-search {
   display: flex;
@@ -492,6 +506,7 @@ img.avatar-img {
 .m-input { font-size: 12px !important; opacity: 0.9; }
 
 .th-streak { width: 140px; text-align: center; }
+.th-tournaments { width: 150px; text-align: center; }
 .th-mvp { width: 70px; text-align: center; }
 
 .streak-ctl {
@@ -528,6 +543,31 @@ img.avatar-img {
   transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 .mini-btn:hover { border-color: rgba(245, 158, 11, 0.6); color: #ffe1a1; background: rgba(245, 158, 11, 0.12); }
+
+/* Tournament trophies 🏆 */
+.trophy-ctl,
+.tournament-ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 4px 5px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-dim);
+}
+.trophy-num,
+.tournament-num {
+  min-width: 34px;
+  text-align: center;
+  color: #c4b5fd;
+  padding: 0 6px;
+}
+.trophy-ctl .mini-btn:hover,
+.tournament-ctl .mini-btn:hover { border-color: rgba(167, 139, 250, 0.6); color: #ddd6fe; background: rgba(124, 58, 237, 0.12); }
 
 .star-btn {
   width: 36px;

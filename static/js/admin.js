@@ -192,6 +192,7 @@
       .then(function (data) {
         state.players = data.players || [];
         state.lastUpdated = data.last_updated || null;
+        state.totalTournaments = data.total_tournaments || 0;
         renderDashboard();
       })
       .catch(function () { toast("\u062a\u0639\u0630\u0631 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a.", true); });
@@ -203,6 +204,9 @@
 
     els.kpiPlayers.textContent = players.length;
     els.kpiPoints.textContent = points;
+    if (els.kpiTotalTournaments) {
+      els.kpiTotalTournaments.textContent = state.totalTournaments || 0;
+    }
     els.kpiUpdated.textContent = (state.lastUpdated || "\u2014")
       .toString().replace("T", " ").slice(0, 16);
 
@@ -294,6 +298,7 @@
         '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
+          (p.mvp_count ? '<span class="mvp-count">\u00d7' + p.mvp_count + "</span>" : "") +
         "</button></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="btn btn-primary inline-save" data-action="save" ' + (saving ? "disabled" : "") + ">" +
@@ -320,6 +325,7 @@
     else if (action === "delete") confirmDelete(id);
     else if (action === "streak") addStreak(id, btn.getAttribute("data-delta"));
     else if (action === "mvp") toggleMvp(id);
+    else if (action === "tournaments") addTournaments(id, btn.getAttribute("data-delta"));
   }
 
   function addStreak(id, delta) {
@@ -340,6 +346,17 @@
         state.lastUpdated = res.last_updated || state.lastUpdated;
         renderDashboard();
         toast("\u2b50 \u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0631\u0643\u0632 (MVP).");
+      })
+      .catch(function (err) { toast(err.message, true); });
+  }
+
+  function addTournaments(id, delta) {
+    api("/api/players/" + id + "/tournaments", { method: "POST", body: { delta: parseInt(delta, 10) || 1 } })
+      .then(function (res) {
+        state.players = res.players || [];
+        state.lastUpdated = res.last_updated || state.lastUpdated;
+        renderDashboard();
+        toast("\ud83c\udfc6 \u062a\u0645 \u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0628\u0637\u0648\u0644\u0627\u062a \u0628\u0646\u062c\u0627\u062d.");
       })
       .catch(function (err) { toast(err.message, true); });
   }
@@ -504,6 +521,20 @@
       renderTable();
     });
 
+    if (els.leagueTournamentBtn) {
+      els.leagueTournamentBtn.addEventListener("click", function () {
+        api("/api/league/tournament", { method: "POST" })
+          .then(function (res) {
+            state.players = res.players || [];
+            state.lastUpdated = res.last_updated || state.lastUpdated;
+            state.totalTournaments = res.total_tournaments || (state.totalTournaments + 1);
+            renderDashboard();
+            toast("\ud83c\udfc6 \u062a\u0645 \u062a\u0633\u062c\u064a\u0644 \u062f\u0648\u0631\u0629 \u062c\u062f\u064a\u062f\u0629 \u0644\u0644\u062f\u0648\u0631\u064a.");
+          })
+          .catch(function (err) { toast(err.message, true); });
+      });
+    }
+
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
         if (!els.modalBg.hidden) els.modalBg.hidden = true;
@@ -528,6 +559,8 @@
 
       kpiPlayers: $("kpi-players"),
       kpiPoints: $("kpi-points"),
+      kpiTotalTournaments: $("kpi-total-tournaments"),
+      leagueTournamentBtn: $("league-tournament-btn"),
       kpiUpdated: $("kpi-updated"),
       adminSearch: $("admin-search"),
       adminBody: $("admin-body"),

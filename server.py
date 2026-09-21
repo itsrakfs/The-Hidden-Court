@@ -278,6 +278,41 @@ def restore_from_seed(conn):
         elif points > 0:
             conn.execute("""INSERT INTO point_history (player_id, old_points, new_points, delta, created_at)
                    VALUES (?, ?, ?, ?, ?)""", (player_id, 0, points, points, created))
+
+        # Lifetime streak/MVP/tournaments events ride along with the snapshot
+        # so a redeploy never wipes a player's progression log.
+        for e in entry.get("events") or []:
+            try:
+                old_v = max(0, int(e.get("old_value", 0)))
+                new_v = max(0, int(e.get("new_value", 0)))
+            except (TypeError, ValueError):
+                continue
+            conn.execute(
+                """INSERT INTO player_events
+                       (player_id, kind, old_value, new_value, note, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (player_id,
+                 (e.get("kind") or "")[:32],
+                 old_v, new_v,
+                 (e.get("note") or "")[:160],
+                 e.get("created_at") or created),
+            )
+
+    try:
+        total = max(0, int(data.get("total_tournaments", 0)))
+    except (TypeError, ValueError):
+        total = 0
+    if total:
+        try:
+            conn.execute(
+                """INSERT INTO league_rounds (id, total, updated_at)
+                   VALUES (1, ?, ?)
+                   ON CONFLICT(id) DO UPDATE SET total = excluded.total,
+                       updated_at = excluded.updated_at""",
+                (total, created),
+            )
+        except Exception:
+            pass
     return seeded > 0
 
 
@@ -314,6 +349,22 @@ def init_db():
             );
             CREATE INDEX IF NOT EXISTS idx_point_history_player
                 ON point_history (player_id, created_at);
+            CREATE TABLE IF NOT EXISTS player_events (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                player_id   INTEGER NOT NULL,
+                kind        TEXT NOT NULL,
+                old_value   INTEGER NOT NULL DEFAULT 0,
+                new_value   INTEGER NOT NULL DEFAULT 0,
+                note        TEXT NOT NULL DEFAULT '',
+                created_at  TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_events_player
+                ON player_events (player_id, created_at);
+            CREATE TABLE IF NOT EXISTS league_rounds (
+                id    INTEGER PRIMARY KEY CHECK (id = 1),
+                total INTEGER NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL DEFAULT ''
+            );
             """
         )
         migrate_players(conn)
@@ -341,6 +392,21 @@ def now_utc():
 
 
 TREND_WINDOW_SECONDS = 3 * 24 * 60 * 60  # arrows stay visible for 3 days
+
+
+def log_event(conn, player_id, kind, old_value, new_value, note=""):
+    """Record a lifetime log entry (streak / mvp / tournaments) per player.
+
+    Like point_history for points, these rows keep the full progression of a
+    player's streak, MVP crowns and tournament titles so nothing is ever lost
+    and they ride along in backups/restores.
+    """
+    conn.execute(
+        """INSERT INTO player_events
+               (player_id, kind, old_value, new_value, note, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (player_id, kind, old_value, new_value, note, now_utc()),
+    )
 
 
 def trend_for(row):
@@ -379,7 +445,7 @@ def fetch_ranking(conn):
                 "rank": i,
                 "name": row["name"],
                 "points": row["points"],
-"team": row["team"],
+                "team": row["team"],
                 "image": row["image"] or "",
                 "streak": row["streak"],
                 "streak_peak": row["streak_peak"],
@@ -394,7 +460,13 @@ def fetch_ranking(conn):
         if last_updated is None or row["updated_at"] > last_updated:
             last_updated = row["updated_at"]
 
-    return {"players": players, "last_updated": last_updated}
+    league = conn.execute("SELECT total FROM league_rounds WHERE id = 1").fetchone()
+    total_rounds = league["total"] if league else 0
+    return {
+        "players": players,
+        "last_updated": last_updated,
+        "total_tournaments": total_rounds,
+    }
 
 
 # --------------------------------------------------------------------------
@@ -469,6 +541,13 @@ def api_player_history(player_id):
             (player_id,),
         ).fetchall()
 
+        events = conn.execute(
+            """SELECT kind, old_value, new_value, note, created_at
+               FROM player_events WHERE player_id = ?
+               ORDER BY created_at ASC, id ASC""",
+            (player_id,),
+        ).fetchall()
+
         ranking = fetch_ranking(conn)["players"]
         player = next((p for p in ranking if p["id"] == player_id), None)
 
@@ -485,6 +564,7 @@ def api_player_history(player_id):
                 "trend": trend_for(row),
             },
             "history": [dict(h) for h in history],
+            "events": [dict(e) for e in events],
             "stats": {
                 "season_points": season_points,
                 "peak": peak,
@@ -664,6 +744,8 @@ def api_add_streak(player_id):
             "UPDATE players SET streak = ?, streak_peak = ?, updated_at = ? WHERE id = ?",
             (new_streak, new_peak, ts, player_id),
         )
+        log_event(conn, player_id, "streak", row["streak"], new_streak,
+                  "peak {} ".format(new_peak) if new_peak > row["streak_peak"] else "")
         return jsonify(fetch_ranking(conn))
 
 
@@ -698,6 +780,28 @@ def api_add_tournaments(player_id):
             "UPDATE players SET tournaments = ?, updated_at = ? WHERE id = ?",
             (new_tournaments, ts, player_id),
         )
+        log_event(conn, player_id, "tournaments", row["tournaments"], new_tournaments)
+        return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/league/tournament", methods=["POST"])
+@admin_required
+@csrf_required
+def api_add_league_tournament():
+    """Record one league tournament/round (admin button).
+
+    This bumps the overall league tournament counter shown as "عدد البطولات"
+    on the home page — a single number for the league itself, independent from
+    each player's own title count.
+    """
+    with get_db() as conn:
+        conn.execute(
+            """INSERT INTO league_rounds (id, total, updated_at)
+               VALUES (1, 1, ?)
+               ON CONFLICT(id) DO UPDATE SET
+                   total = total + 1, updated_at = excluded.updated_at""",
+            (now_utc(),),
+        )
         return jsonify(fetch_ranking(conn))
 
 
@@ -717,6 +821,7 @@ def api_toggle_mvp(player_id):
                 "UPDATE players SET is_mvp = 0, updated_at = ? WHERE id = ?",
                 (ts, player_id),
             )
+            log_event(conn, player_id, "mvp", 1, 0, "MVP removed")
         else:
             # Crowning a new MVP: bump the lifetime counter and grant the
             # +1 gift point defined in the rules (kept forever in history,
@@ -737,6 +842,8 @@ def api_toggle_mvp(player_id):
                    VALUES (?, ?, ?, ?, ?)""",
                 (player_id, row["points"], new_points, 1, ts),
             )
+            log_event(conn, player_id, "mvp", int(row["is_mvp"]), 1,
+                      "MVP #{} +1 gift point".format(new_mvp_count))
         return jsonify(fetch_ranking(conn))
 
 
@@ -781,9 +888,18 @@ def api_backup():
                 (r["id"],),
             ).fetchall()
             pl["points_history"] = [dict(h) for h in hist]
+            events = conn.execute(
+                """SELECT kind, old_value, new_value, note, created_at
+                   FROM player_events
+                   WHERE player_id = ? ORDER BY created_at ASC, id ASC""",
+                (r["id"],),
+            ).fetchall()
+            pl["events"] = [dict(e) for e in events]
             del pl["id"]
             players.append(pl)
     payload = {"players": players}
+    league = conn.execute("SELECT total FROM league_rounds WHERE id = 1").fetchone()
+    payload["total_tournaments"] = league["total"] if league else 0
     body = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     return Response(
         body,

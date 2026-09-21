@@ -379,6 +379,12 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.pod-name .mvp-badge,
+.pod-name .streak-chip,
+.pod-name .mvp-count-badge {
+  margin-inline-start: 6px;
+  vertical-align: middle;
+}
 .pod-team {
   font-family: var(--font-display);
   font-size: 11px;
@@ -653,6 +659,26 @@ img.avatar-img {
   line-height: 1.5;
   white-space: nowrap;
   box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
+  animation: badgePop 0.5s ease;
+}
+
+/* Lifetime MVP win count ⭐ ×N */
+.mvp-count-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd9a6;
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.22), rgba(202, 108, 8, 0.18));
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 999px;
+  padding: 2px 9px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
   animation: badgePop 0.5s ease;
 }
 tr.mvp-row {

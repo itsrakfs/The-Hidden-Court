@@ -5,13 +5,13 @@
       "points": 13,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-16T12:59:42+00:00",
-      "updated_at": "2026-09-18T22:28:00+00:00",
+      "updated_at": "2026-09-21T04:07:13+00:00",
       "points_changed_at": "2026-09-18T22:28:00+00:00",
       "points_direction": 1,
       "points_history": [
@@ -32,6 +32,15 @@
           "new_points": 13,
           "delta": 4,
           "created_at": "2026-09-18T22:28:00+00:00"
+        }
+      ],
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:07:13+00:00"
         }
       ]
     },
@@ -68,7 +77,8 @@
           "delta": 5,
           "created_at": "2026-09-18T22:27:22+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Anas Fayed",
@@ -103,7 +113,8 @@
           "delta": 1,
           "created_at": "2026-09-18T22:30:15+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Waleed Allam",
@@ -132,7 +143,8 @@
           "delta": 4,
           "created_at": "2026-09-18T13:00:04+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Adel Eltahan",
@@ -167,7 +179,8 @@
           "delta": 1,
           "created_at": "2026-09-19T19:13:39+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Ahmed Ramadan",
@@ -196,7 +209,8 @@
           "delta": 2,
           "created_at": "2026-09-19T15:41:08+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Eyad Eleterby",
@@ -231,7 +245,8 @@
           "delta": 3,
           "created_at": "2026-09-18T13:00:41+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Noor Elsherbeny",
@@ -254,7 +269,8 @@
           "delta": 5,
           "created_at": "2026-09-17T13:01:47+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Zeyad Meshaal",
@@ -289,7 +305,8 @@
           "delta": 1,
           "created_at": "2026-09-19T19:13:52+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Fahd Elboredy",
@@ -312,7 +329,8 @@
           "delta": 4,
           "created_at": "2026-09-18T22:29:02+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Ahmed Hamam",
@@ -335,7 +353,8 @@
           "delta": 3,
           "created_at": "2026-09-18T22:32:00+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Mohamed Salah",
@@ -358,7 +377,8 @@
           "delta": 3,
           "created_at": "2026-09-17T13:02:35+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Ali Maged",
@@ -393,7 +413,8 @@
           "delta": 2,
           "created_at": "2026-09-18T13:04:44+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Makram Mahmoud",
@@ -416,7 +437,8 @@
           "delta": 2,
           "created_at": "2026-09-17T13:05:37+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Momen Sharaby",
@@ -439,7 +461,8 @@
           "delta": 2,
           "created_at": "2026-09-19T15:40:42+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Ahmed Ayaad",
@@ -462,7 +485,8 @@
           "delta": 1,
           "created_at": "2026-09-17T13:05:52+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Ahmed Hany",
@@ -485,7 +509,8 @@
           "delta": 1,
           "created_at": "2026-09-17T13:06:22+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Yasen Aboelfatoh",
@@ -514,7 +539,8 @@
           "delta": 1,
           "created_at": "2026-09-18T22:30:06+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Body Essam",
@@ -537,7 +563,8 @@
           "delta": 0,
           "created_at": "2026-09-18T22:41:14+00:00"
         }
-      ]
+      ],
+      "events": []
     },
     {
       "name": "Omar Emad",
@@ -560,7 +587,9 @@
           "delta": 0,
           "created_at": "2026-09-18T22:41:52+00:00"
         }
-      ]
+      ],
+      "events": []
     }
-  ]
+  ],
+  "total_tournaments": 1
 }

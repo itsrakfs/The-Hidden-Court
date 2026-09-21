@@ -124,6 +124,13 @@
     var mvpEl = $("p-mvp");
     if (mvpEl) mvpEl.hidden = !p.is_mvp;
 
+    var mvpCountEl = $("p-mvp-count");
+    if (mvpCountEl) {
+      var mc = p.mvp_count || 0;
+      mvpCountEl.textContent = "\u2b50 \u00d7" + mc;
+      mvpCountEl.hidden = !(mc > 0);
+    }
+
     var streakEl = $("p-streak");
     if (streakEl) {
       if (p.streak > 0) { streakEl.textContent = "\ud83d\udd25 " + p.streak; streakEl.hidden = false; }
@@ -149,6 +156,7 @@
     $("s-season").textContent = st.season_points != null ? st.season_points : "\u2014";
     $("s-first").textContent = st.matches ? (st.season_points / st.matches).toFixed(1) : "\u2014";
     $("s-streakpeak").textContent = (p.streak_peak || 0) > 0 ? p.streak_peak : "\u2014";
+    $("s-mvpcount").textContent = (p.mvp_count || 0) > 0 ? p.mvp_count : "\u2014";
 
     $("profile-hero").hidden = false;
 
@@ -176,6 +184,37 @@
         '</li>';
     }
     listEl.innerHTML = html;
+
+    // lifetime events (streak / mvp / tournaments)
+    var events = data.events || [];
+    var eListEl = $("e-list");
+    var eEmptyEl = $("e-empty");
+    if (eListEl) {
+      eListEl.innerHTML = "";
+      if (!events.length) {
+        eEmptyEl.hidden = false;
+      } else {
+        eEmptyEl.hidden = true;
+        var ehtml = "";
+        for (var j = 0; j < events.length; j++) {
+          var ev = events[j];
+          var label = ev.kind === "streak" ? "\ud83d\udd25 \u0627\u0644\u0633\u062a\u0631\u064a\u0643"
+                    : ev.kind === "mvp" ? "\u2b50 \u0627\u0644\u0645\u0641"
+                    : ev.kind === "tournaments" ? "\ud83c\udfc6 \u0627\u0644\u0628\u0637\u0648\u0644\u0629"
+                    : escapeHtml(ev.kind || "");
+          var change = ev.kind === "mvp"
+            ? (ev.new_value ? "\u062a\u062a\u0648\u06cc\u062c" : "\u0625\u0644\u063a\u0627\u0621")
+            : (ev.old_value + " \u2192 " + ev.new_value);
+          ehtml +=
+            '<li class="history-item">' +
+              '<span class="hist-date">' + shortDate(ev.created_at) + '</span>' +
+              '<span class="hist-change">' + label + '</span>' +
+              '<span class="hist-range">' + change + (ev.note ? " \u00b7 " + escapeHtml(ev.note) : "") + '</span>' +
+            '</li>';
+        }
+        eListEl.innerHTML = ehtml;
+      }
+    }
   }
 
   function load() {

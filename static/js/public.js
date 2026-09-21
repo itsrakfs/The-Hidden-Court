@@ -62,7 +62,9 @@
     return (Date.now() - d.getTime()) < NEW_DAYS * 24 * 60 * 60 * 1000;
   }
 
-  var TOURNAMENT_POINTS = 30; // every 30 points = one league tournament
+  function mvpBadgeHtml() {
+    return '<span class="mvp-badge">MVP</span>';
+  }
 
   function avatarInner(p) {
     var url = (p.image || "").trim();
@@ -73,13 +75,14 @@
     return escapeHtml(initials(p.name));
   }
 
-  function mvpBadgeHtml() {
-    return '<span class="mvp-badge">MVP</span>';
-  }
-
   function streakHtml(p) {
     if (!(p.streak > 0)) return "";
     return '<span class="streak-chip">\ud83d\udd25 ' + p.streak + '</span>';
+  }
+
+  function mvpCountHtml(p) {
+    if (!(p.mvp_count > 0)) return "";
+    return '<span class="mvp-count-badge" title="\u0645\u0631\u0627\u062a \u0627\u0644\u0645\u0641">\u2b50 ' + p.mvp_count + '</span>';
   }
 
   // ------------------------------------------------------------------ fetch
@@ -178,12 +181,13 @@
 
   function renderStats() {
     var totalPoints = state.players.reduce(function (s, p) { return s + (p.points || 0); }, 0);
+    var totalTournaments = state.total_tournaments || 0;
     animateValue(els.statPlayers, state.players.length, "players");
     animateValue(els.statPoints, totalPoints, "points");
     els.statAvg.textContent = state.players.length
       ? Math.round(totalPoints / state.players.length)
       : "\u2014";
-    animateValue(els.statTournaments, Math.floor(totalPoints / TOURNAMENT_POINTS), "tournaments");
+    animateValue(els.statTournaments, totalTournaments, "tournaments");
   }
 
   // Animated number counter (animates the first paint only; instant afterwards)
@@ -263,7 +267,8 @@
       var nameEl = els["pod" + r + "Name"];
       nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>' +
         (p.is_mvp ? mvpBadgeHtml() : "") +
-        streakHtml(p);
+        streakHtml(p) +
+        mvpCountHtml(p);
       if (els["pod" + r + "Avatar"]) {
         els["pod" + r + "Avatar"].innerHTML = avatarInner(p);
         els["pod" + r + "Avatar"].className = "pod-avatar pod-avatar-link";
@@ -312,6 +317,7 @@
               '</a>' +
               (p.is_mvp ? mvpBadgeHtml() : "") +
               streakHtml(p) +
+              mvpCountHtml(p) +
               (isNew(p) ? '<span class="new-badge">\u062c\u062f\u064a\u062f</span>' : "") +
             '</span>' +
             teamLabel(p) +

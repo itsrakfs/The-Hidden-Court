@@ -17,7 +17,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=9" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v=10" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
 </head>
@@ -121,34 +121,16 @@
           </span>
           <div>
             <span class="rule-kicker" lang="ar">الستريك</span>
-            <h2 class="rule-title" lang="ar">قاعدة الستريك</h2>
+            <h2 class="rule-title" lang="ar">قاعدة الستريك 🔥</h2>
           </div>
         </div>
         <ul class="rule-list" lang="ar">
-          <li>الستريك = <strong>الدورات المتتالية اللي بتشارك فيها</strong> في البطولة.</li>
-          <li>أي <strong>مشاركة</strong> في دورة بتزود الستريك <strong>+1</strong> — تكسب أو تخسر، المهم إنك <strong>حضرت وشاركت</strong> في الدورات بالترتيب.</li>
-          <li>لما الستريك يوصلك <strong>4 دورات متتالية</strong> → بتاخد <strong>نقطة بونص في التصنيف</strong> تلقائيًا، وبتتكتب في سجلّك.</li>
-          <li>ولو كملت <strong>8، 12، 16…</strong> البونص بيتكرر كل 4 — وبعد <strong>12</strong> بيبقى <strong>نقطتين</strong> بدل نقطة.</li>
-          <li>لو <strong>غيبت عن أي دورة</strong> → الستريك بيرجع <strong>صفر</strong> وتبدأ من جديد (وأقصى ستريك ليك بيتسجّل في سجلّك للأبد).</li>
-          <li><strong>تعديلات نقاطك أو مركزك ملهاش أي علاقة بالستريك</strong> — الستريك محفوظ مستقل في سجلّك دايماً.</li>
-        </ul>
-      </section>
-
-      <section class="rule-card rule-card--streak-rules" data-rules>
-        <div class="rule-card-head">
-          <span class="rule-ico rule-ico--streak">
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M13 3L5 13h5l-1 8 8-10h-5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-          </span>
-          <div>
-            <span class="rule-kicker" lang="ar">الستريك</span>
-            <h2 class="rule-title" lang="ar">قاعدة الستريك</h2>
-          </div>
-        </div>
-        <ul class="rule-list" lang="ar">
-          <li>الستريك = <strong>دورات متتالية يشارك فيها نفس اللاعب</strong> (مش نقط — مشاركة في بطولات متتالية).</li>
-          <li>كل <strong>4 ستريك متتالي</strong> → بيلتقط اللاعب <strong>نقطة زيادة في التصنيف</strong> (بونص ستريك، بيتسجّل في التاريخ).</li>
-          <li>لو اللاعب <strong>فاته دورة</strong> → الستريك بيرجع <strong>صفر</strong> والكاونتر يبتدي من جديد (وأقصى ستريك بيرجع يتسجّل دايماً).</li>
-          <li>الستريك بيتحسب <strong>تلقائيًا مع كل مشاركة</strong> ومحفوظ <strong>دايمًا في سجلّك</strong> — تعديل النقاط أو المركز أو الـ MVP <strong>مابيمسحهمش أبدًا</strong>.</li>
+          <li>كل <strong>ستريك +1</strong> بيتضاف = <strong>مشاركة في بطولة متتالية</strong> — بتحصل لتكسب أو تخسر، المهم إنك حضرت وشاركت.</li>
+          <li>لو <strong>فوت بطولة واحدة</strong> أو غيبت عنها → الستريك بيرجع <strong>صفر</strong> وتبدأ العد من جديد.</li>
+          <li>على كل <strong>4 ستريك متتالي</strong> (4، 8، 12) → بتاخد <strong>نقطة زيادة في التصنيف</strong> تلقائيًا وبتتكتب في سجلّك.</li>
+          <li>ولو وصلت <strong>12 بطولة ستريك</strong> → كل 4 ستريك بعدها هتزودك <strong>نقطتين</strong> بدل نقطة: يعني <strong>الستريك 16 → +2 نقطة</strong>، والـ 20 → +2، وهكذا.</li>
+          <li>أقصى ستريك وصلت له (الـ peak) <strong>بيتحفظ في سجلّك للأبد</strong> — حتى لو الستريك الحالي رجع صفر بسبب غياب.</li>
+          <li>الستريك محفوظ <strong>مستقل وبيرجع دائمًا في النسخ الاحتياطي</strong> — تعديل النقاط أو المركز أو الـ MVP <strong>مابيمسحوش أي بيانات ليك أبدًا</strong>.</li>
         </ul>
       </section>
 
@@ -158,15 +140,16 @@
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 2l2.6 5.6 6.1.8-4.4 4.2 1 6.1L12 16.2 6.7 18.9l1-6.1-4.4-4.2 6.1-.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
           </span>
           <div>
-            <span class="rule-kicker" lang="ar">لقب الشهر</span>
-            <h2 class="rule-title" lang="ar">قاعدة الـ MVP</h2>
+            <span class="rule-kicker" lang="ar">الـ MVP</span>
+            <h2 class="rule-title" lang="ar">قاعدة الـ MVP ⭐</h2>
           </div>
         </div>
         <ul class="rule-list" lang="ar">
-          <li>كل شهر بيتوجّب <strong>MVP واحد</strong> (النجمة الذهبية) — أول ما تتوجّل لاعب جديد، أي MVP قديم بيتشال أوتوماتيك عشان يفضل واحد بس.</li>
+          <li>في <strong>كل بطولة</strong> بيكون في <strong>لاعب واحد بس</strong> هو الـ MVP (النجمة الذهبية) — أي توج جديد بيشيل أي MVP قديم تلقائيًا عشان يفضل واحد بس.</li>
+          <li>الـ MVP بيفضل محتفظ باللقب <strong>لغاية البطولة اللي بعدها</strong> — اسمه بيظهر <strong>باللون الأخضر</strong> ومميز في التصنيف والبروفايل والمنصة.</li>
           <li>بمجرد التتويج → اللاعب بياخد <strong>نقطة هدية +1</strong> تُضاف لرصيده فورًا ومكتوبة في سجل النقاط للأبد.</li>
-          <li>الـ MVP كمان بيحسب له <strong>عدد مرات الفوز باللقب</strong> — بيظهر على صفحته الشخصية جنب النقاط.</li>
-          <li>لو اتشالت الـ MVP بعدين، <strong>نقطة الهدية مش بتتسحب</strong> — العدّاد والقصة محفوظين في النسخ الاحتياطي.</li>
+          <li><strong>عدد مرات الفوز بالـ MVP</strong> بيتحسب للاعب وبيظهر في بروفايله الشخصية (⭐ ×N) ومحفوظ في النسخ الاحتياطي.</li>
+          <li>لو اتشال الـ MVP بعدين، <strong>نقطة الهدية مش بتتسحب</strong> والعدّاد محفوظ — <strong>أي تعديل مابيمسحش بيانات ليك أبدًا</strong>.</li>
         </ul>
       </section>
 
@@ -181,9 +164,9 @@
           </div>
         </div>
         <ul class="rule-list" lang="ar">
-          <li>لو ماتش انتهى بـ <strong>6-0</strong> (فوز ساحق بدون ما الخصم ياخد جيم) → نقاط البطولة دي <strong>بتتضاعف</strong> للفايز.</li>
-          <li>يعني بدل النقاط العادية بتاعة المركز، بيتحتسب الـ <strong>ضعفها</strong> — والأدمن بيقدر يختار الفوز الساحق من لوحة التحكم.</li>
-          <li>الفارق الصحي في جيم واحد (مش 6-0) بيعتمد على النقاط العادية زي ما هو.</li>
+          <li>لو لاعب <strong>كسب كل ماتشاته في الدورة بنتيجة 6-0</strong> (فوز ساحق من غير ما الخصم ياخد أي جيم) → نقاط البطولة دي <strong>بتتضاعف</strong> ليه.</li>
+          <li>يعني بدل النقاط العادية بتاعة المركز، بيتحتسب <strong>الضعف</strong> — والأدمن بيقدر يسجّل الفوز الساحق من لوحة التحكم.</li>
+          <li>الفارق العادي بجيم أو أكتر (مش 6-0 في الكل) بياخد نقاطه العادية زي ما هو.</li>
         </ul>
       </section>
 
