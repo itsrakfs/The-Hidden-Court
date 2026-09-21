@@ -103,6 +103,7 @@
 
         state.players = data.players || [];
         state.lastUpdated = data.last_updated || null;
+        state.total_tournaments = data.total_tournaments || 0;
         populateTeams();
         render();
 

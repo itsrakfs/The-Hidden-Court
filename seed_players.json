@@ -2,17 +2,17 @@
   "players": [
     {
       "name": "Mohamed Reda",
-      "points": 13,
+      "points": 14,
       "team": "",
       "image": "",
-      "streak": 1,
-      "streak_peak": 1,
+      "streak": 3,
+      "streak_peak": 3,
       "is_mvp": 0,
-      "mvp_count": 0,
-      "tournaments": 0,
+      "mvp_count": 1,
+      "tournaments": 1,
       "created_at": "2026-09-16T12:59:42+00:00",
-      "updated_at": "2026-09-21T04:07:13+00:00",
-      "points_changed_at": "2026-09-18T22:28:00+00:00",
+      "updated_at": "2026-09-21T04:35:34+00:00",
+      "points_changed_at": "2026-09-21T04:35:34+00:00",
       "points_direction": 1,
       "points_history": [
         {
@@ -32,6 +32,12 @@
           "new_points": 13,
           "delta": 4,
           "created_at": "2026-09-18T22:28:00+00:00"
+        },
+        {
+          "old_points": 13,
+          "new_points": 14,
+          "delta": 1,
+          "created_at": "2026-09-21T04:35:34+00:00"
         }
       ],
       "events": [
@@ -41,21 +47,49 @@
           "new_value": 1,
           "note": "peak 1 ",
           "created_at": "2026-09-21T04:07:13+00:00"
+        },
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:38+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 1,
+          "new_value": 2,
+          "note": "peak 2 ",
+          "created_at": "2026-09-21T04:34:56+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 2,
+          "new_value": 3,
+          "note": "peak 3 ",
+          "created_at": "2026-09-21T04:34:57+00:00"
+        },
+        {
+          "kind": "mvp",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "MVP #1 +1 gift point",
+          "created_at": "2026-09-21T04:35:34+00:00"
         }
       ]
     },
     {
       "name": "Marawan Elsaadany",
       "points": 10,
-      "team": "ØªÙÙ ÙÙÙÙÙ",
+      "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 3,
+      "streak_peak": 3,
       "is_mvp": 0,
       "mvp_count": 0,
-      "tournaments": 0,
+      "tournaments": 1,
       "created_at": "2026-09-16T13:01:18+00:00",
-      "updated_at": "2026-09-18T22:27:22+00:00",
+      "updated_at": "2026-09-21T04:34:58+00:00",
       "points_changed_at": "2026-09-18T22:27:22+00:00",
       "points_direction": 1,
       "points_history": [
@@ -78,20 +112,49 @@
           "created_at": "2026-09-18T22:27:22+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:39+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:57+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 1,
+          "new_value": 2,
+          "note": "peak 2 ",
+          "created_at": "2026-09-21T04:34:58+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 2,
+          "new_value": 3,
+          "note": "peak 3 ",
+          "created_at": "2026-09-21T04:34:58+00:00"
+        }
+      ]
     },
     {
       "name": "Anas Fayed",
       "points": 9,
-      "team": "ØªÙÙ Ø´ÙÙØ¬Ø§ÙØ§Ù",
+      "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 3,
+      "streak_peak": 3,
       "is_mvp": 0,
       "mvp_count": 0,
-      "tournaments": 0,
+      "tournaments": 1,
       "created_at": "2026-09-16T13:00:18+00:00",
-      "updated_at": "2026-09-18T22:30:15+00:00",
+      "updated_at": "2026-09-21T04:35:00+00:00",
       "points_changed_at": "2026-09-18T22:30:15+00:00",
       "points_direction": 1,
       "points_history": [
@@ -114,7 +177,36 @@
           "created_at": "2026-09-18T22:30:15+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:40+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:59+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 1,
+          "new_value": 2,
+          "note": "peak 2 ",
+          "created_at": "2026-09-21T04:35:00+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 2,
+          "new_value": 3,
+          "note": "peak 3 ",
+          "created_at": "2026-09-21T04:35:00+00:00"
+        }
+      ]
     },
     {
       "name": "Waleed Allam",
@@ -125,9 +217,9 @@
       "streak_peak": 0,
       "is_mvp": 0,
       "mvp_count": 0,
-      "tournaments": 0,
+      "tournaments": 1,
       "created_at": "2026-09-16T13:00:04+00:00",
-      "updated_at": "2026-09-16T13:00:04+00:00",
+      "updated_at": "2026-09-21T04:34:42+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -144,20 +236,28 @@
           "created_at": "2026-09-18T13:00:04+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:42+00:00"
+        }
+      ]
     },
     {
       "name": "Adel Eltahan",
       "points": 8,
-      "team": "ØªÙÙ ÙÙÙÙÙ",
+      "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
-      "tournaments": 0,
+      "tournaments": 1,
       "created_at": "2026-09-16T13:05:01+00:00",
-      "updated_at": "2026-09-19T19:13:39+00:00",
+      "updated_at": "2026-09-21T04:35:03+00:00",
       "points_changed_at": "2026-09-19T19:13:39+00:00",
       "points_direction": 1,
       "points_history": [
@@ -180,21 +280,36 @@
           "created_at": "2026-09-19T19:13:39+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:43+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:35:03+00:00"
+        }
+      ]
     },
     {
       "name": "Ahmed Ramadan",
-      "points": 6,
+      "points": 7,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
-      "mvp_count": 0,
+      "mvp_count": 1,
       "tournaments": 0,
       "created_at": "2026-09-19T15:41:00+00:00",
-      "updated_at": "2026-09-19T15:41:08+00:00",
-      "points_changed_at": "2026-09-19T15:41:08+00:00",
+      "updated_at": "2026-09-21T04:35:39+00:00",
+      "points_changed_at": "2026-09-21T04:35:39+00:00",
       "points_direction": 1,
       "points_history": [
         {
@@ -208,9 +323,30 @@
           "new_points": 6,
           "delta": 2,
           "created_at": "2026-09-19T15:41:08+00:00"
+        },
+        {
+          "old_points": 6,
+          "new_points": 7,
+          "delta": 1,
+          "created_at": "2026-09-21T04:35:39+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:35:08+00:00"
+        },
+        {
+          "kind": "mvp",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "MVP #1 +1 gift point",
+          "created_at": "2026-09-21T04:35:39+00:00"
+        }
+      ]
     },
     {
       "name": "Eyad Eleterby",
@@ -257,9 +393,9 @@
       "streak_peak": 0,
       "is_mvp": 0,
       "mvp_count": 0,
-      "tournaments": 0,
+      "tournaments": 1,
       "created_at": "2026-09-16T13:01:47+00:00",
-      "updated_at": "2026-09-16T13:01:47+00:00",
+      "updated_at": "2026-09-21T04:34:45+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -270,20 +406,28 @@
           "created_at": "2026-09-17T13:01:47+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "tournaments",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "",
+          "created_at": "2026-09-21T04:34:45+00:00"
+        }
+      ]
     },
     {
       "name": "Zeyad Meshaal",
       "points": 5,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 2,
+      "streak_peak": 2,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-16T13:06:36+00:00",
-      "updated_at": "2026-09-19T19:13:52+00:00",
+      "updated_at": "2026-09-21T04:35:12+00:00",
       "points_changed_at": "2026-09-19T19:13:52+00:00",
       "points_direction": 1,
       "points_history": [
@@ -306,20 +450,80 @@
           "created_at": "2026-09-19T19:13:52+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:35:12+00:00"
+        },
+        {
+          "kind": "streak",
+          "old_value": 1,
+          "new_value": 2,
+          "note": "peak 2 ",
+          "created_at": "2026-09-21T04:35:12+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Ahmed Hamam",
+      "points": 4,
+      "team": "",
+      "image": "",
+      "streak": 1,
+      "streak_peak": 1,
+      "is_mvp": 1,
+      "mvp_count": 1,
+      "tournaments": 0,
+      "created_at": "2026-09-18T22:32:00+00:00",
+      "updated_at": "2026-09-21T04:35:43+00:00",
+      "points_changed_at": "2026-09-21T04:35:43+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-18T22:32:00+00:00"
+        },
+        {
+          "old_points": 3,
+          "new_points": 4,
+          "delta": 1,
+          "created_at": "2026-09-21T04:35:43+00:00"
+        }
+      ],
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:35:18+00:00"
+        },
+        {
+          "kind": "mvp",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "MVP #1 +1 gift point",
+          "created_at": "2026-09-21T04:35:43+00:00"
+        }
+      ]
     },
     {
       "name": "Fahd Elboredy",
       "points": 4,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-18T22:29:02+00:00",
-      "updated_at": "2026-09-18T22:29:02+00:00",
+      "updated_at": "2026-09-21T04:35:17+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -330,31 +534,15 @@
           "created_at": "2026-09-18T22:29:02+00:00"
         }
       ],
-      "events": []
-    },
-    {
-      "name": "Ahmed Hamam",
-      "points": 3,
-      "team": "",
-      "image": "",
-      "streak": 0,
-      "streak_peak": 0,
-      "is_mvp": 0,
-      "mvp_count": 0,
-      "tournaments": 0,
-      "created_at": "2026-09-18T22:32:00+00:00",
-      "updated_at": "2026-09-18T22:32:00+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
+      "events": [
         {
-          "old_points": 0,
-          "new_points": 3,
-          "delta": 3,
-          "created_at": "2026-09-18T22:32:00+00:00"
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:35:17+00:00"
         }
-      ],
-      "events": []
+      ]
     },
     {
       "name": "Mohamed Salah",
@@ -445,13 +633,13 @@
       "points": 2,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-19T15:40:42+00:00",
-      "updated_at": "2026-09-19T15:40:42+00:00",
+      "updated_at": "2026-09-21T04:34:10+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -462,7 +650,15 @@
           "created_at": "2026-09-19T15:40:42+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:10+00:00"
+        }
+      ]
     },
     {
       "name": "Ahmed Ayaad",
@@ -515,15 +711,15 @@
     {
       "name": "Yasen Aboelfatoh",
       "points": 1,
-      "team": "ØªÙÙ Ø´ÙÙØ¬Ø§ÙØ§Ù",
+      "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-18T16:01:26+00:00",
-      "updated_at": "2026-09-18T22:30:06+00:00",
+      "updated_at": "2026-09-21T04:34:21+00:00",
       "points_changed_at": "2026-09-18T22:30:06+00:00",
       "points_direction": 1,
       "points_history": [
@@ -540,20 +736,28 @@
           "created_at": "2026-09-18T22:30:06+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:16+00:00"
+        }
+      ]
     },
     {
       "name": "Body Essam",
       "points": 0,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-18T22:41:14+00:00",
-      "updated_at": "2026-09-18T22:41:14+00:00",
+      "updated_at": "2026-09-21T04:34:17+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -564,20 +768,28 @@
           "created_at": "2026-09-18T22:41:14+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:17+00:00"
+        }
+      ]
     },
     {
       "name": "Omar Emad",
       "points": 0,
       "team": "",
       "image": "",
-      "streak": 0,
-      "streak_peak": 0,
+      "streak": 1,
+      "streak_peak": 1,
       "is_mvp": 0,
       "mvp_count": 0,
       "tournaments": 0,
       "created_at": "2026-09-18T22:41:52+00:00",
-      "updated_at": "2026-09-18T22:41:52+00:00",
+      "updated_at": "2026-09-21T04:34:18+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -588,7 +800,15 @@
           "created_at": "2026-09-18T22:41:52+00:00"
         }
       ],
-      "events": []
+      "events": [
+        {
+          "kind": "streak",
+          "old_value": 0,
+          "new_value": 1,
+          "note": "peak 1 ",
+          "created_at": "2026-09-21T04:34:18+00:00"
+        }
+      ]
     }
   ],
   "total_tournaments": 3
