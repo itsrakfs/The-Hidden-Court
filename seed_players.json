@@ -1,11 +1,328 @@
 {
   "players": [
     {
+      "name": "Mohamed Reda",
+      "points": 13,
+      "team": "",
+      "created_at": "2026-09-16T12:59:42+00:00",
+      "updated_at": "2026-09-18T22:28:00+00:00",
+      "points_changed_at": "2026-09-18T22:28:00+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-17T12:59:42+00:00"
+        },
+        {
+          "old_points": 5,
+          "new_points": 9,
+          "delta": 4,
+          "created_at": "2026-09-18T12:59:42+00:00"
+        },
+        {
+          "old_points": 9,
+          "new_points": 13,
+          "delta": 4,
+          "created_at": "2026-09-18T22:28:00+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Marawan Elsaadany",
+      "points": 10,
+      "team": "تيم كويوو",
+      "created_at": "2026-09-16T13:01:18+00:00",
+      "updated_at": "2026-09-18T22:27:22+00:00",
+      "points_changed_at": "2026-09-18T22:27:22+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 2,
+          "delta": 2,
+          "created_at": "2026-09-17T13:01:18+00:00"
+        },
+        {
+          "old_points": 2,
+          "new_points": 5,
+          "delta": 3,
+          "created_at": "2026-09-18T13:01:18+00:00"
+        },
+        {
+          "old_points": 5,
+          "new_points": 10,
+          "delta": 5,
+          "created_at": "2026-09-18T22:27:22+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Anas Fayed",
+      "points": 9,
+      "team": "تيم شينجالان",
+      "created_at": "2026-09-16T13:00:18+00:00",
+      "updated_at": "2026-09-18T22:30:15+00:00",
+      "points_changed_at": "2026-09-18T22:30:15+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-17T13:00:18+00:00"
+        },
+        {
+          "old_points": 3,
+          "new_points": 8,
+          "delta": 5,
+          "created_at": "2026-09-18T13:00:18+00:00"
+        },
+        {
+          "old_points": 8,
+          "new_points": 9,
+          "delta": 1,
+          "created_at": "2026-09-18T22:30:15+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Waleed Allam",
+      "points": 9,
+      "team": "",
+      "created_at": "2026-09-16T13:00:04+00:00",
+      "updated_at": "2026-09-16T13:00:04+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-17T13:00:04+00:00"
+        },
+        {
+          "old_points": 5,
+          "new_points": 9,
+          "delta": 4,
+          "created_at": "2026-09-18T13:00:04+00:00"
+        }
+      ]
+    },
+    {
       "name": "Adel Eltahan",
+      "points": 8,
+      "team": "تيم كويوو",
+      "created_at": "2026-09-16T13:05:01+00:00",
+      "updated_at": "2026-09-19T19:13:39+00:00",
+      "points_changed_at": "2026-09-19T19:13:39+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 2,
+          "delta": 2,
+          "created_at": "2026-09-17T13:05:01+00:00"
+        },
+        {
+          "old_points": 2,
+          "new_points": 7,
+          "delta": 5,
+          "created_at": "2026-09-18T22:27:36+00:00"
+        },
+        {
+          "old_points": 7,
+          "new_points": 8,
+          "delta": 1,
+          "created_at": "2026-09-19T19:13:39+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Ahmed Ramadan",
+      "points": 6,
+      "team": "",
+      "created_at": "2026-09-19T15:41:00+00:00",
+      "updated_at": "2026-09-19T15:41:08+00:00",
+      "points_changed_at": "2026-09-19T15:41:08+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 4,
+          "delta": 4,
+          "created_at": "2026-09-19T15:41:00+00:00"
+        },
+        {
+          "old_points": 4,
+          "new_points": 6,
+          "delta": 2,
+          "created_at": "2026-09-19T15:41:08+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Eyad Eleterby",
+      "points": 6,
+      "team": "",
+      "created_at": "2026-09-16T13:00:41+00:00",
+      "updated_at": "2026-09-17T23:58:44+00:00",
+      "points_changed_at": "2026-09-17T23:58:44+00:00",
+      "points_direction": -1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 4,
+          "delta": 4,
+          "created_at": "2026-09-17T13:00:41+00:00"
+        },
+        {
+          "old_points": 7,
+          "new_points": 6,
+          "delta": -1,
+          "created_at": "2026-09-17T23:58:44+00:00"
+        },
+        {
+          "old_points": 4,
+          "new_points": 7,
+          "delta": 3,
+          "created_at": "2026-09-18T13:00:41+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Noor Elsherbeny",
+      "points": 5,
+      "team": "",
+      "created_at": "2026-09-16T13:01:47+00:00",
+      "updated_at": "2026-09-16T13:01:47+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 5,
+          "delta": 5,
+          "created_at": "2026-09-17T13:01:47+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Zeyad Meshaal",
+      "points": 5,
+      "team": "",
+      "created_at": "2026-09-16T13:06:36+00:00",
+      "updated_at": "2026-09-19T19:13:52+00:00",
+      "points_changed_at": "2026-09-19T19:13:52+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-17T13:06:36+00:00"
+        },
+        {
+          "old_points": 1,
+          "new_points": 4,
+          "delta": 3,
+          "created_at": "2026-09-18T22:31:36+00:00"
+        },
+        {
+          "old_points": 4,
+          "new_points": 5,
+          "delta": 1,
+          "created_at": "2026-09-19T19:13:52+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Fahd Elboredy",
+      "points": 4,
+      "team": "",
+      "created_at": "2026-09-18T22:29:02+00:00",
+      "updated_at": "2026-09-18T22:29:02+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 4,
+          "delta": 4,
+          "created_at": "2026-09-18T22:29:02+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Ahmed Hamam",
+      "points": 3,
+      "team": "",
+      "created_at": "2026-09-18T22:32:00+00:00",
+      "updated_at": "2026-09-18T22:32:00+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-18T22:32:00+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Mohamed Salah",
+      "points": 3,
+      "team": "",
+      "created_at": "2026-09-16T13:02:35+00:00",
+      "updated_at": "2026-09-16T13:02:35+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 3,
+          "delta": 3,
+          "created_at": "2026-09-17T13:02:35+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Ali Maged",
       "points": 2,
       "team": "",
-      "created_at": "2026-09-16T13:05:01+00:00",
-      "updated_at": "2026-09-16T13:05:01+00:00",
+      "created_at": "2026-09-16T13:04:44+00:00",
+      "updated_at": "2026-09-17T23:58:02+00:00",
+      "points_changed_at": "2026-09-17T23:58:02+00:00",
+      "points_direction": -1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-17T13:04:44+00:00"
+        },
+        {
+          "old_points": 3,
+          "new_points": 2,
+          "delta": -1,
+          "created_at": "2026-09-17T23:58:02+00:00"
+        },
+        {
+          "old_points": 1,
+          "new_points": 3,
+          "delta": 2,
+          "created_at": "2026-09-18T13:04:44+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Makram Mahmoud",
+      "points": 2,
+      "team": "",
+      "created_at": "2026-09-16T13:05:37+00:00",
+      "updated_at": "2026-09-16T13:05:37+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
@@ -13,7 +330,24 @@
           "old_points": 0,
           "new_points": 2,
           "delta": 2,
-          "created_at": "2026-09-17T13:05:01+00:00"
+          "created_at": "2026-09-17T13:05:37+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Momen Sharaby",
+      "points": 2,
+      "team": "",
+      "created_at": "2026-09-19T15:40:42+00:00",
+      "updated_at": "2026-09-19T15:40:42+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 2,
+          "delta": 2,
+          "created_at": "2026-09-19T15:40:42+00:00"
         }
       ]
     },
@@ -52,225 +386,59 @@
       ]
     },
     {
-      "name": "Ahmed Ramadan",
-      "points": 4,
-      "team": "",
-      "created_at": "2026-09-16T13:02:08+00:00",
-      "updated_at": "2026-09-16T13:02:08+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 4,
-          "delta": 4,
-          "created_at": "2026-09-17T13:02:08+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Ali Maged",
-      "points": 3,
-      "team": "",
-      "created_at": "2026-09-16T13:04:44+00:00",
-      "updated_at": "2026-09-16T13:04:44+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 1,
-          "delta": 1,
-          "created_at": "2026-09-17T13:04:44+00:00"
-        },
-        {
-          "old_points": 1,
-          "new_points": 3,
-          "delta": 2,
-          "created_at": "2026-09-18T13:04:44+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Anas Fayed",
-      "points": 8,
-      "team": "",
-      "created_at": "2026-09-16T13:00:18+00:00",
-      "updated_at": "2026-09-16T13:00:18+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 3,
-          "delta": 3,
-          "created_at": "2026-09-17T13:00:18+00:00"
-        },
-        {
-          "old_points": 3,
-          "new_points": 8,
-          "delta": 5,
-          "created_at": "2026-09-18T13:00:18+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Eyad Eleterby",
-      "points": 7,
-      "team": "",
-      "created_at": "2026-09-16T13:00:41+00:00",
-      "updated_at": "2026-09-16T13:00:41+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 4,
-          "delta": 4,
-          "created_at": "2026-09-17T13:00:41+00:00"
-        },
-        {
-          "old_points": 4,
-          "new_points": 7,
-          "delta": 3,
-          "created_at": "2026-09-18T13:00:41+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Makram Mahmoud",
-      "points": 2,
-      "team": "",
-      "created_at": "2026-09-16T13:05:37+00:00",
-      "updated_at": "2026-09-16T13:05:37+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 2,
-          "delta": 2,
-          "created_at": "2026-09-17T13:05:37+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Marawan Elsaadany",
-      "points": 5,
-      "team": "",
-      "created_at": "2026-09-16T13:01:18+00:00",
-      "updated_at": "2026-09-16T13:01:18+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 2,
-          "delta": 2,
-          "created_at": "2026-09-17T13:01:18+00:00"
-        },
-        {
-          "old_points": 2,
-          "new_points": 5,
-          "delta": 3,
-          "created_at": "2026-09-18T13:01:18+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Mohamed Reda",
-      "points": 9,
-      "team": "",
-      "created_at": "2026-09-16T12:59:42+00:00",
-      "updated_at": "2026-09-16T12:59:42+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 5,
-          "delta": 5,
-          "created_at": "2026-09-17T12:59:42+00:00"
-        },
-        {
-          "old_points": 5,
-          "new_points": 9,
-          "delta": 4,
-          "created_at": "2026-09-18T12:59:42+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Mohamed Salah",
-      "points": 3,
-      "team": "",
-      "created_at": "2026-09-16T13:02:35+00:00",
-      "updated_at": "2026-09-16T13:02:35+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 3,
-          "delta": 3,
-          "created_at": "2026-09-17T13:02:35+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Noor Elsherbeny",
-      "points": 5,
-      "team": "",
-      "created_at": "2026-09-16T13:01:47+00:00",
-      "updated_at": "2026-09-16T13:01:47+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 5,
-          "delta": 5,
-          "created_at": "2026-09-17T13:01:47+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Waleed Allam",
-      "points": 9,
-      "team": "",
-      "created_at": "2026-09-16T13:00:04+00:00",
-      "updated_at": "2026-09-16T13:00:04+00:00",
-      "points_changed_at": "",
-      "points_direction": 0,
-      "points_history": [
-        {
-          "old_points": 0,
-          "new_points": 5,
-          "delta": 5,
-          "created_at": "2026-09-17T13:00:04+00:00"
-        },
-        {
-          "old_points": 5,
-          "new_points": 9,
-          "delta": 4,
-          "created_at": "2026-09-18T13:00:04+00:00"
-        }
-      ]
-    },
-    {
-      "name": "Zeyad Meshaal",
+      "name": "Yasen Aboelfatoh",
       "points": 1,
+      "team": "تيم شينجالان",
+      "created_at": "2026-09-18T16:01:26+00:00",
+      "updated_at": "2026-09-18T22:30:06+00:00",
+      "points_changed_at": "2026-09-18T22:30:06+00:00",
+      "points_direction": 1,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 0,
+          "delta": 0,
+          "created_at": "2026-09-18T16:01:26+00:00"
+        },
+        {
+          "old_points": 0,
+          "new_points": 1,
+          "delta": 1,
+          "created_at": "2026-09-18T22:30:06+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Body Essam",
+      "points": 0,
       "team": "",
-      "created_at": "2026-09-16T13:06:36+00:00",
-      "updated_at": "2026-09-16T13:06:36+00:00",
+      "created_at": "2026-09-18T22:41:14+00:00",
+      "updated_at": "2026-09-18T22:41:14+00:00",
       "points_changed_at": "",
       "points_direction": 0,
       "points_history": [
         {
           "old_points": 0,
-          "new_points": 1,
-          "delta": 1,
-          "created_at": "2026-09-17T13:06:36+00:00"
+          "new_points": 0,
+          "delta": 0,
+          "created_at": "2026-09-18T22:41:14+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Omar Emad",
+      "points": 0,
+      "team": "",
+      "created_at": "2026-09-18T22:41:52+00:00",
+      "updated_at": "2026-09-18T22:41:52+00:00",
+      "points_changed_at": "",
+      "points_direction": 0,
+      "points_history": [
+        {
+          "old_points": 0,
+          "new_points": 0,
+          "delta": 0,
+          "created_at": "2026-09-18T22:41:52+00:00"
         }
       ]
     }
