@@ -6,3 +6,5 @@ players.db
 .vscode/
 .idea/
 .DS_Store
+players.db-shm
+players.db-wal
