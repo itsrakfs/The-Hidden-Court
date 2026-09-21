@@ -222,14 +222,14 @@
     var rulesBtn = document.getElementById("share-rules-btn");
     if (rulesBtn) {
       rulesBtn.addEventListener("click", function () {
-        capture("#share-canvas", "قواعد-الدوري.png", "قواعد دوري The Hidden Court", false);
+        capture("#share-canvas", "hidden-court-rules.png", "قواعد دوري The Hidden Court", false);
       });
     }
 
     var rankBtn = document.getElementById("share-ranking-btn");
     if (rankBtn) {
       rankBtn.addEventListener("click", function () {
-        capture("#share-canvas", "تصنيف-الدوري.png", "ترتيب لاعبي The Hidden Court", true);
+        capture("#share-canvas", "hidden-court-ranking.png", "ترتيب لاعبي The Hidden Court", true);
       });
     }
   }
