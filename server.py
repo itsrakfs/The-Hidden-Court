@@ -152,6 +152,7 @@ def migrate_players(conn):
                 points_direction    INTEGER NOT NULL DEFAULT 0,
                 image               TEXT NOT NULL DEFAULT '',
                 streak              INTEGER NOT NULL DEFAULT 0,
+                streak_peak         INTEGER NOT NULL DEFAULT 0,
                 is_mvp              INTEGER NOT NULL DEFAULT 0
             );
 
@@ -177,6 +178,8 @@ def migrate_players(conn):
         conn.execute("ALTER TABLE players ADD COLUMN image TEXT NOT NULL DEFAULT ''")
     if "streak" not in cols:
         conn.execute("ALTER TABLE players ADD COLUMN streak INTEGER NOT NULL DEFAULT 0")
+    if "streak_peak" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN streak_peak INTEGER NOT NULL DEFAULT 0")
     if "is_mvp" not in cols:
         conn.execute("ALTER TABLE players ADD COLUMN is_mvp INTEGER NOT NULL DEFAULT 0")
 
@@ -214,6 +217,10 @@ def restore_from_seed(conn):
         except (TypeError, ValueError):
             streak = 0
         try:
+            streak_peak = max(0, int(entry.get("streak_peak", streak)))
+        except (TypeError, ValueError):
+            streak_peak = streak
+        try:
             is_mvp = 1 if int(entry.get("is_mvp", 0)) else 0
         except (TypeError, ValueError):
             is_mvp = 0
@@ -227,10 +234,10 @@ def restore_from_seed(conn):
             direction = 0
         cur = conn.execute(
             """INSERT INTO players
-                   (name, points, team, image, streak, is_mvp,
+                   (name, points, team, image, streak, streak_peak, is_mvp,
                     created_at, updated_at, points_changed_at, points_direction)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (name, points, team, image, streak, is_mvp, created, updated, changed, direction),
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (name, points, team, image, streak, streak_peak, is_mvp, created, updated, changed, direction),
         )
         player_id = cur.lastrowid
         seeded += 1
@@ -275,6 +282,7 @@ def init_db():
                 points_direction    INTEGER NOT NULL DEFAULT 0,
                 image               TEXT NOT NULL DEFAULT '',
                 streak              INTEGER NOT NULL DEFAULT 0,
+                streak_peak         INTEGER NOT NULL DEFAULT 0,
                 is_mvp              INTEGER NOT NULL DEFAULT 0
             );
             CREATE TABLE IF NOT EXISTS admins (
@@ -360,6 +368,7 @@ def fetch_ranking(conn):
 "team": row["team"],
                 "image": row["image"] or "",
                 "streak": row["streak"],
+                "streak_peak": row["streak_peak"],
                 "is_mvp": bool(row["is_mvp"]),
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
@@ -613,16 +622,31 @@ def api_update_player(player_id):
 @admin_required
 @csrf_required
 def api_add_streak(player_id):
-    """Increment a player's participation streak (admin clicks the 🔥 +1)."""
+    """Change a player's participation streak by +1 or -1 (admin buttons).
+
+    streak_peak keeps the highest streak the player reached so it survives
+    decreases/resets and shows on the profile page.
+    """
+    data = request.get_json(silent=True) or {}
+    try:
+        delta = int(data.get("delta", 1))
+    except (TypeError, ValueError):
+        delta = 1
+    if delta == 0:
+        delta = 1
+    delta = 1 if delta > 0 else -1
+
     with get_db() as conn:
         row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
         if not row:
             return jsonify({"error": "Player not found"}), 404
 
         ts = now_utc()
+        new_streak = max(0, row["streak"] + delta)
+        new_peak = max(row["streak_peak"], new_streak)
         conn.execute(
-            "UPDATE players SET streak = streak + 1, updated_at = ? WHERE id = ?",
-            (ts, player_id),
+            "UPDATE players SET streak = ?, streak_peak = ?, updated_at = ? WHERE id = ?",
+            (new_streak, new_peak, ts, player_id),
         )
         return jsonify(fetch_ranking(conn))
 
@@ -677,7 +701,7 @@ def api_backup():
 
     with get_db() as conn:
         rows = conn.execute(
-            """SELECT id, name, points, team, image, streak, is_mvp,
+            """SELECT id, name, points, team, image, streak, streak_peak, is_mvp,
                       created_at, updated_at,
                       points_changed_at, points_direction
                FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""

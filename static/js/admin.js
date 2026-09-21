@@ -246,8 +246,11 @@
         "</span><span>" + escapeHtml(p.name) + "</span></div></td>" +
         '<td class="th-team">' + (p.team ? '<span class="team-tag">' + escapeHtml(p.team) + "</span>" : "<span class=\"muted\">\u2014</span>") + "</td>" +
         '<td class="th-num">' + p.points + "</td>" +
-        '<td class="th-streak"><button class="fire-btn' + ((p.streak || 0) > 0 ? " has-streak" : "") +
-          '" data-action="streak" title="\u0625\u0636\u0627\u0641\u0629 1 \u0645\u0634\u0627\u0631\u0643\u0629">\ud83d\udd25 ' + (p.streak || 0) + "</button></td>" +
+        '<td class="th-streak"><div class="streak-ctl">' +
+          '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
+          '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
+          '<button class="mini-btn" data-action="streak" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
+        "</div></td>" +
         '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
@@ -271,8 +274,11 @@
         "</div></td>" +
         '<td class="th-team"><input class="name-input" data-field="team" maxlength="40" value="' + escapeHtml(p.team || "") + '" placeholder="\u0641\u0631\u064a\u0642" /></td>' +
         '<td class="th-num"><input class="text-input" type="number" min="0" data-field="points" value="' + p.points + '" /></td>' +
-        '<td class="th-streak"><button class="fire-btn' + ((p.streak || 0) > 0 ? " has-streak" : "") +
-          '" data-action="streak" title="\u0625\u0636\u0627\u0641\u0629 1 \u0645\u0634\u0627\u0631\u0643\u0629">\ud83d\udd25 ' + (p.streak || 0) + "</button></td>" +
+        '<td class="th-streak"><div class="streak-ctl">' +
+          '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
+          '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
+          '<button class="mini-btn" data-action="streak" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
+        "</div></td>" +
         '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
@@ -300,17 +306,17 @@
     else if (action === "cancel") { state.editingId = null; renderTable(); }
     else if (action === "save") saveRow(id, tr);
     else if (action === "delete") confirmDelete(id);
-    else if (action === "streak") addStreak(id);
+    else if (action === "streak") addStreak(id, btn.getAttribute("data-delta"));
     else if (action === "mvp") toggleMvp(id);
   }
 
-  function addStreak(id) {
-    api("/api/players/" + id + "/streak", { method: "POST" })
+  function addStreak(id, delta) {
+    api("/api/players/" + id + "/streak", { method: "POST", body: { delta: parseInt(delta, 10) || 1 } })
       .then(function (res) {
         state.players = res.players || [];
         state.lastUpdated = res.last_updated || state.lastUpdated;
         renderDashboard();
-        toast("\ud83d\udd25 \u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 \u0645\u0634\u0627\u0631\u0643\u0629 \u0628\u0646\u062c\u0627\u062d.");
+        toast("\ud83d\udd25 \u062a\u0645 \u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0633\u062a\u0631\u064a\u0643 \u0628\u0646\u062c\u0627\u062d.");
       })
       .catch(function (err) { toast(err.message, true); });
   }

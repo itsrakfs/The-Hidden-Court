@@ -148,6 +148,7 @@
     $("s-peak").textContent = st.peak != null ? st.peak : "\u2014";
     $("s-season").textContent = st.season_points != null ? st.season_points : "\u2014";
     $("s-first").textContent = st.matches ? (st.season_points / st.matches).toFixed(1) : "\u2014";
+    $("s-streakpeak").textContent = (p.streak_peak || 0) > 0 ? p.streak_peak : "\u2014";
 
     $("profile-hero").hidden = false;
 

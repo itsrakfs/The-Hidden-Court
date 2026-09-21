@@ -491,26 +491,43 @@ img.avatar-img {
 .edit-cell .name-input { width: 100%; box-sizing: border-box; }
 .m-input { font-size: 12px !important; opacity: 0.9; }
 
-.th-streak { width: 110px; text-align: center; }
+.th-streak { width: 140px; text-align: center; }
 .th-mvp { width: 70px; text-align: center; }
 
-.fire-btn {
+.streak-ctl {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-family: var(--font-display);
-  font-size: 13px;
   font-weight: 700;
-  padding: 6px 12px;
+  font-size: 13px;
+  padding: 4px 5px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.04);
   color: var(--ink-dim);
+}
+.streak-num {
+  min-width: 34px;
+  text-align: center;
+  color: #ffe1a1;
+  padding: 0 6px;
+}
+.mini-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink-faint);
+  font-size: 15px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
   cursor: pointer;
   transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
-.fire-btn:hover { border-color: rgba(245, 158, 11, 0.6); color: #ffe1a1; background: rgba(245, 158, 11, 0.12); }
-.fire-btn.has-streak { border-color: rgba(245, 158, 11, 0.45); color: #ffe1a1; background: rgba(245, 158, 11, 0.1); }
+.mini-btn:hover { border-color: rgba(245, 158, 11, 0.6); color: #ffe1a1; background: rgba(245, 158, 11, 0.12); }
 
 .star-btn {
   width: 36px;
