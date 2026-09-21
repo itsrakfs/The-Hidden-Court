@@ -381,7 +381,8 @@ body {
 }
 .pod-name .mvp-badge,
 .pod-name .streak-chip,
-.pod-name .mvp-count-badge {
+.pod-name .mvp-count-badge,
+.pod-name .tournament-chip {
   margin-inline-start: 6px;
   vertical-align: middle;
 }
@@ -679,6 +680,26 @@ img.avatar-img {
   line-height: 1.5;
   white-space: nowrap;
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+  animation: badgePop 0.5s ease;
+}
+
+/* Lifetime tournament wins 🏆 ×N */
+.tournament-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffe7ad;
+  background: linear-gradient(145deg, rgba(217, 175, 44, 0.25), rgba(146, 105, 20, 0.2));
+  border: 1px solid rgba(217, 175, 44, 0.5);
+  border-radius: 999px;
+  padding: 2px 9px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(217, 175, 44, 0.3);
   animation: badgePop 0.5s ease;
 }
 tr.mvp-row {

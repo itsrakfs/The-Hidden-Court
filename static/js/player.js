@@ -137,6 +137,13 @@
       else streakEl.hidden = true;
     }
 
+    var tourEl = $("p-tournaments");
+    if (tourEl) {
+      var tc = p.tournaments || 0;
+      tourEl.textContent = "\ud83c\udfc6 \u00d7" + tc;
+      tourEl.hidden = !(tc > 0);
+    }
+
     if (p.team && p.team.trim()) {
       $("p-team").textContent = p.team.trim();
       $("p-team").hidden = false;
@@ -157,6 +164,7 @@
     $("s-first").textContent = st.matches ? (st.season_points / st.matches).toFixed(1) : "\u2014";
     $("s-streakpeak").textContent = (p.streak_peak || 0) > 0 ? p.streak_peak : "\u2014";
     $("s-mvpcount").textContent = (p.mvp_count || 0) > 0 ? p.mvp_count : "\u2014";
+    $("s-tournaments").textContent = (p.tournaments || 0) > 0 ? p.tournaments : "\u2014";
 
     $("profile-hero").hidden = false;
 

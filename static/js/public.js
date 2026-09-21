@@ -85,6 +85,11 @@
     return '<span class="mvp-count-badge" title="\u0645\u0631\u0627\u062a \u0627\u0644\u0645\u0641">\u2b50 ' + p.mvp_count + '</span>';
   }
 
+  function tournamentsHtml(p) {
+    if (!(p.tournaments > 0)) return "";
+    return '<span class="tournament-chip" title="\u0627\u0644\u0628\u0637\u0648\u0644\u0627\u062a \u0627\u0644\u0641\u0648\u0632 \u0628\u0647\u0627">\ud83c\udfc6 ' + p.tournaments + '</span>';
+  }
+
   // ------------------------------------------------------------------ fetch
   function fetchRanking(isAuto) {
     fetch("/api/ranking", { cache: "no-store" })
@@ -95,10 +100,10 @@
       .then(function (data) {
         var changed =
           JSON.stringify(data.players.map(function (p) {
-            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.tournaments, p.updated_at];
           })) !==
           JSON.stringify(state.players.map(function (p) {
-            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.tournaments, p.updated_at];
           }));
 
         state.players = data.players || [];
@@ -269,7 +274,8 @@
       nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>' +
         (p.is_mvp ? mvpBadgeHtml() : "") +
         streakHtml(p) +
-        mvpCountHtml(p);
+        mvpCountHtml(p) +
+        tournamentsHtml(p);
       if (els["pod" + r + "Avatar"]) {
         els["pod" + r + "Avatar"].innerHTML = avatarInner(p);
         els["pod" + r + "Avatar"].className = "pod-avatar pod-avatar-link";
@@ -319,6 +325,7 @@
               (p.is_mvp ? mvpBadgeHtml() : "") +
               streakHtml(p) +
               mvpCountHtml(p) +
+              tournamentsHtml(p) +
               (isNew(p) ? '<span class="new-badge">\u062c\u062f\u064a\u062f</span>' : "") +
             '</span>' +
             teamLabel(p) +
