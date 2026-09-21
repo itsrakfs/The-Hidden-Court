@@ -11,6 +11,7 @@ The password is never stored as plain text.
 import argparse
 import json
 import os
+import re
 import secrets
 import sqlite3
 from datetime import datetime, timezone
@@ -760,6 +761,54 @@ def api_add_streak(player_id):
         return jsonify(fetch_ranking(conn))
 
 
+@app.route("/api/players/<int:player_id>/streak/undo", methods=["POST"])
+@admin_required
+@csrf_required
+def api_undo_streak(player_id):
+    """Revert the last streak change for a player (admin undo button).
+
+    Rolls the streak back to the value it had before the last streak event
+    and recomputes streak_peak from the remaining streak history, keeping the
+    highest value the player genuinely reached. The mistaken event row is
+    deleted from the log so no trace of the error is left.
+    """
+    with get_db() as conn:
+        row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        event = conn.execute(
+            """SELECT id, old_value FROM player_events
+               WHERE player_id = ? AND kind = 'streak'
+               ORDER BY id DESC LIMIT 1""",
+            (player_id,),
+        ).fetchone()
+        if not event:
+            return jsonify({"error": "No streak entry to undo"}), 400
+
+        ts = now_utc()
+        restored_streak = max(0, int(event["old_value"]))
+        conn.execute(
+            "UPDATE players SET streak = ?, updated_at = ? WHERE id = ?",
+            (restored_streak, ts, player_id),
+        )
+        # Recompute the peak from the remaining streak history (never below the
+        # restored current value, so a real historical high keeps its record).
+        peaks = conn.execute(
+            """SELECT new_value FROM player_events
+               WHERE player_id = ? AND kind = 'streak' AND id != ?
+               ORDER BY new_value DESC LIMIT 1""",
+            (player_id, event["id"]),
+        ).fetchone()
+        new_peak = max(0, restored_streak, int(peaks["new_value"]) if peaks else 0)
+        conn.execute(
+            "UPDATE players SET streak_peak = ? WHERE id = ?",
+            (new_peak, player_id),
+        )
+        conn.execute("DELETE FROM player_events WHERE id = ?", (event["id"],))
+        return jsonify(fetch_ranking(conn))
+
+
 @app.route("/api/players/<int:player_id>/tournaments", methods=["POST"])
 @admin_required
 @csrf_required
@@ -799,20 +848,37 @@ def api_add_tournaments(player_id):
 @admin_required
 @csrf_required
 def api_add_league_tournament():
-    """Record one league tournament/round (admin button).
+    """Record one league tournament/round (admin button) or set it manually.
 
-    This bumps the overall league tournament counter shown as "عدد البطولات"
+    This bumps the overall league tournament counter shown as "عدد الدورات"
     on the home page — a single number for the league itself, independent from
     each player's own title count.
+
+    Send `{"total": N}` to set the counter exactly (manual edit for fixing a
+    mistaken round count); send an empty body to increment by one.
     """
+    data = request.get_json(silent=True) or {}
     with get_db() as conn:
-        conn.execute(
-            """INSERT INTO league_rounds (id, total, updated_at)
-               VALUES (1, 1, ?)
-               ON CONFLICT(id) DO UPDATE SET
-                   total = total + 1, updated_at = excluded.updated_at""",
-            (now_utc(),),
-        )
+        if "total" in data:
+            try:
+                total = max(0, int(data["total"]))
+            except (TypeError, ValueError):
+                total = 0
+            conn.execute(
+                """INSERT INTO league_rounds (id, total, updated_at)
+                   VALUES (1, ?, ?)
+                   ON CONFLICT(id) DO UPDATE SET
+                       total = excluded.total, updated_at = excluded.updated_at""",
+                (total, now_utc()),
+            )
+        else:
+            conn.execute(
+                """INSERT INTO league_rounds (id, total, updated_at)
+                   VALUES (1, 1, ?)
+                   ON CONFLICT(id) DO UPDATE SET
+                       total = total + 1, updated_at = excluded.updated_at""",
+                (now_utc(),),
+            )
         return jsonify(fetch_ranking(conn))
 
 
@@ -837,6 +903,12 @@ def api_toggle_mvp(player_id):
             # Crowning a new MVP: bump the lifetime counter and grant the
             # +1 gift point defined in the rules (kept forever in history,
             # never removed when the MVP flag is later turned off).
+            # Remember who held the badge before, so a mistaken crown can be
+            # cleanly undone (the badge returns to this previous holder).
+            prev_holder = conn.execute(
+                "SELECT id FROM players WHERE is_mvp = 1 AND id != ? LIMIT 1",
+                (player_id,),
+            ).fetchone()
             new_mvp_count = int(row["mvp_count"]) + 1
             new_points = int(row["points"]) + 1
             conn.execute("UPDATE players SET is_mvp = 0")
@@ -853,8 +925,91 @@ def api_toggle_mvp(player_id):
                    VALUES (?, ?, ?, ?, ?)""",
                 (player_id, row["points"], new_points, 1, ts),
             )
-            log_event(conn, player_id, "mvp", int(row["is_mvp"]), 1,
-                      "MVP #{} +1 gift point".format(new_mvp_count))
+            note = "MVP #{} +1 gift point".format(new_mvp_count)
+            if prev_holder:
+                note += " prev_mvp=" + str(prev_holder["id"])
+            log_event(conn, player_id, "mvp", int(row["is_mvp"]), 1, note)
+        return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/players/<int:player_id>/mvp/undo", methods=["POST"])
+@admin_required
+@csrf_required
+def api_undo_mvp(player_id):
+    """Revert the last MVP action for a player (admin undo button).
+
+    Undoes a mistaken MVP crown completely:
+      - subtracts the +1 gift point and lowers mvp_count back,
+      - returns the MVP badge to whoever held it before the mistake,
+      - removes the crowning event and its +1 point-history row so no trace
+        of the error is left in the profile.
+
+    If the last MVP event was a removal (flag turned off), it simply restores
+    the badge and deletes that event row.
+    """
+    with get_db() as conn:
+        row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        event = conn.execute(
+            """SELECT id, old_value, new_value, note, created_at FROM player_events
+               WHERE player_id = ? AND kind = 'mvp'
+               ORDER BY id DESC LIMIT 1""",
+            (player_id,),
+        ).fetchone()
+        if not event:
+            return jsonify({"error": "No MVP entry to undo"}), 400
+
+        ts = now_utc()
+
+        if event["new_value"] == 1:
+            # This was a crowning: roll back point, count, badge and history.
+            prev_mvp = None
+            m = re.search(r"prev_mvp=(\d+)", event["note"] or "")
+            if m:
+                prev_mvp = int(m.group(1))
+            new_points = max(0, int(row["points"]) - 1)
+            new_mvp_count = max(0, int(row["mvp_count"]) - 1)
+            if row["is_mvp"]:
+                conn.execute(
+                    "UPDATE players SET is_mvp = 0, updated_at = ? WHERE id = ?",
+                    (ts, player_id),
+                )
+            conn.execute(
+                """UPDATE players
+                   SET mvp_count = ?, points = ?, updated_at = ?,
+                       points_changed_at = ?, points_direction = -1
+                   WHERE id = ?""",
+                (new_mvp_count, new_points, ts, ts, player_id),
+            )
+            # Restore the badge to the player who held it before this crown
+            # (captured at crowning time and carried in the event note).
+            if prev_mvp:
+                exists = conn.execute(
+                    "SELECT id FROM players WHERE id = ?", (prev_mvp,)
+                ).fetchone()
+                if exists:
+                    conn.execute(
+                        "UPDATE players SET is_mvp = 1, updated_at = ? WHERE id = ?",
+                        (ts, prev_mvp),
+                    )
+            # Remove the +1 gift point from the points history (matches the
+            # delta-1 row created at the exact crowning timestamp).
+            conn.execute(
+                """DELETE FROM point_history
+                   WHERE player_id = ? AND delta = 1 AND created_at = ?""",
+                (player_id, event["created_at"]),
+            )
+        else:
+            # The last mvp event was a removal (flag turned off): restore it.
+            if not row["is_mvp"]:
+                conn.execute(
+                    "UPDATE players SET is_mvp = 1, updated_at = ? WHERE id = ?",
+                    (ts, player_id),
+                )
+
+        conn.execute("DELETE FROM player_events WHERE id = ?", (event["id"],))
         return jsonify(fetch_ranking(conn))
 
 

@@ -207,6 +207,9 @@
     if (els.kpiTotalTournaments) {
       els.kpiTotalTournaments.textContent = state.totalTournaments || 0;
     }
+    if (els.leagueRoundsInput) {
+      els.leagueRoundsInput.value = state.totalTournaments || 0;
+    }
     els.kpiUpdated.textContent = (state.lastUpdated || "\u2014")
       .toString().replace("T", " ").slice(0, 16);
 
@@ -259,12 +262,16 @@
           '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
           '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
           '<button class="mini-btn" data-action="streak" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
+          '<button class="mini-btn undo-btn" data-action="streak-undo" title="\u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644">\u2936</button>' +
         "</div></td>" +
-        '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
+        '<td class="th-mvp"><div class="mvp-ctl">' +
+        '<button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
           (p.mvp_count ? '<span class="mvp-count">\u00d7' + p.mvp_count + "</span>" : "") +
-        "</button></td>" +
+        "</button>" +
+        '<button class="mini-btn undo-btn" data-action="mvp-undo" title="\u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 MVP">\u2936</button>' +
+        "</div></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="icon-btn" data-action="edit" title="Edit"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 3l4 4L8 20H4v-4L17 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>' +
           '<button class="icon-btn danger" data-action="delete" title="Delete"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
@@ -288,6 +295,7 @@
           '<span class="streak-num" title="\u0627\u0644\u0633\u062a\u0631\u064a\u0643">\ud83d\udd25 ' + (p.streak || 0) + "</span>" +
           '<button class="mini-btn" data-action="streak" data-delta="1" title="+1">+</button>' +
           '<button class="mini-btn" data-action="streak" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
+          '<button class="mini-btn undo-btn" data-action="streak-undo" title="\u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644">\u2936</button>' +
         "</div></td>" +
         '<!--B1-->' +
         '<td class="th-tournaments"><div class="tournament-ctl" title="\u0627\u0644\u0628\u0637\u0648\u0644\u0627\u062a">' +
@@ -295,11 +303,14 @@
           '<button class="mini-btn" data-action="tournaments" data-delta="1" title="+1">+</button>' +
           '<button class="mini-btn" data-action="tournaments" data-delta="-1" title="\u0646\u0642\u0635 1">\u2212</button>' +
         "</div></td>" +
-        '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
+        '<td class="th-mvp"><div class="mvp-ctl">' +
+        '<button class="star-btn' + (p.is_mvp ? " active" : "") +
           '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
           (p.is_mvp ? "\u2605" : "\u2606") +
           (p.mvp_count ? '<span class="mvp-count">\u00d7' + p.mvp_count + "</span>" : "") +
-        "</button></td>" +
+        "</button>" +
+        '<button class="mini-btn undo-btn" data-action="mvp-undo" title="\u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 MVP">\u2936</button>' +
+        "</div></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="btn btn-primary inline-save" data-action="save" ' + (saving ? "disabled" : "") + ">" +
             (saving ? "\u062c\u0627\u0631\u064d \u0627\u0644\u062d\u0641\u0638..." : "\u062d\u0641\u0638") +
@@ -324,7 +335,9 @@
     else if (action === "save") saveRow(id, tr);
     else if (action === "delete") confirmDelete(id);
     else if (action === "streak") addStreak(id, btn.getAttribute("data-delta"));
+    else if (action === "streak-undo") undoStreak(id);
     else if (action === "mvp") toggleMvp(id);
+    else if (action === "mvp-undo") undoMvp(id);
     else if (action === "tournaments") addTournaments(id, btn.getAttribute("data-delta"));
   }
 
@@ -346,6 +359,28 @@
         state.lastUpdated = res.last_updated || state.lastUpdated;
         renderDashboard();
         toast("\u2b50 \u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0631\u0643\u0632 (MVP).");
+      })
+      .catch(function (err) { toast(err.message, true); });
+  }
+
+  function undoStreak(id) {
+    api("/api/players/" + id + "/streak/undo", { method: "POST" })
+      .then(function (res) {
+        state.players = res.players || [];
+        state.lastUpdated = res.last_updated || state.lastUpdated;
+        renderDashboard();
+        toast("\ud83d\udd25 \u062a\u0645 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644 \u0633\u062a\u0631\u064a\u0643.");
+      })
+      .catch(function (err) { toast(err.message, true); });
+  }
+
+  function undoMvp(id) {
+    api("/api/players/" + id + "/mvp/undo", { method: "POST" })
+      .then(function (res) {
+        state.players = res.players || [];
+        state.lastUpdated = res.last_updated || state.lastUpdated;
+        renderDashboard();
+        toast("\u2b50 \u062a\u0645 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0622\u062e\u0631 \u0625\u062c\u0631\u0627\u0621 MVP \u0648\u0631\u062c\u0639\u062a \u0627\u0644\u0634\u0627\u0631\u0629 \u0644\u0645\u0646 \u064a\u0633\u062a\u062d\u0642.");
       })
       .catch(function (err) { toast(err.message, true); });
   }
@@ -535,6 +570,25 @@
       });
     }
 
+    if (els.leagueRoundsSet && els.leagueRoundsInput) {
+      els.leagueRoundsSet.addEventListener("click", function () {
+        var val = parseInt(els.leagueRoundsInput.value, 10);
+        if (isNaN(val) || val < 0) val = 0;
+        api("/api/league/tournament", { method: "POST", body: { total: val } })
+          .then(function (res) {
+            state.players = res.players || [];
+            state.lastUpdated = res.last_updated || state.lastUpdated;
+            state.totalTournaments = res.total_tournaments || 0;
+            renderDashboard();
+            toast("\ud83c\udfc6 \u062a\u0645 \u062a\u0639\u064a\u064a\u0646 \u0639\u062f\u062f \u0627\u0644\u062f\u0648\u0631\u0627\u062a \u0625\u0644\u0649 " + val + ".");
+          })
+          .catch(function (err) { toast(err.message, true); });
+      });
+      els.leagueRoundsInput.addEventListener("change", function () {
+        els.leagueRoundsInput.value = parseInt(els.leagueRoundsInput.value, 10) || 0;
+      });
+    }
+
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
         if (!els.modalBg.hidden) els.modalBg.hidden = true;
@@ -561,6 +615,8 @@
       kpiPoints: $("kpi-points"),
       kpiTotalTournaments: $("kpi-total-tournaments"),
       leagueTournamentBtn: $("league-tournament-btn"),
+      leagueRoundsSet: $("league-rounds-set"),
+      leagueRoundsInput: $("league-rounds-input"),
       kpiUpdated: $("kpi-updated"),
       adminSearch: $("admin-search"),
       adminBody: $("admin-body"),

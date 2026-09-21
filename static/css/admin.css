@@ -377,6 +377,27 @@ body {
   background: linear-gradient(135deg, rgba(67, 240, 178, 0.28), rgba(124, 232, 255, 0.24));
   transform: translateY(-1px);
 }
+.league-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.league-input {
+  width: 74px;
+  padding: 8px 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  outline: none;
+}
+.league-input:focus { border-color: rgba(67, 240, 178, 0.5); }
+.league-actions .btn-league { margin-top: 0; }
 
 .admin-search {
   display: flex;
@@ -543,6 +564,15 @@ img.avatar-img {
   transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 .mini-btn:hover { border-color: rgba(245, 158, 11, 0.6); color: #ffe1a1; background: rgba(245, 158, 11, 0.12); }
+.undo-btn { font-size: 13px; }
+.undo-btn:hover { border-color: rgba(239, 68, 68, 0.6); color: #fca5a5; background: rgba(239, 68, 68, 0.12); }
+
+/* MVP star + undo */
+.mvp-ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
 
 /* Tournament trophies 🏆 */
 .trophy-ctl,
