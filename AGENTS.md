@@ -32,9 +32,9 @@ Start-Process -FilePath "python" -ArgumentList "server.py --port 5000" -WorkingD
   - الملف ده **هو الاسترجاع الحقيقي** — أي تغيير في النقاط/اللاعبين من لوحة الإدارة على الموقع الحي **لازم يتنقل لـ seed** بعد ما يتعمل: هنزّل backup من الموقع (زرار "نسخ احتياطي" في `/admin` أو `GET /api/backup` مع جلسة مسجّل دخول) ونستبدل `seed_players.json` به، ثم رفعه.
 - **ممنوع** اننا نحذف أو نغيّر أي بيانات لاعب من غير سؤال المستخدم الأول. المستخدم حساس جدًا للبيانات (كانت حصلت مشاكل فقدان بيانات عربية سابقًا).
 
-## اللاعبين الحاليين (14 لاعبًا، كلهم حالياً 0 نقاط بعد إعادة ضبط)
-أسماء بترتيب seed الجديد (كلهم points=0، history فاضي، بداية جديدة):
-`Mohamed Reda`, `Waleed Allam`, `Anas Fayed`, `Eyad Eleterby`, `Marawan Elsaadany`, `Noor Elsherbeny`, `Ahmed Ramadan`, `Ali Maged`, `Mohamed Salah`, `Adel Eltahan`, `Makram Mahmoud`, `Ahmed Ayaad`, `Ahmed Hany`, `Zeyad Meshaal`
+## اللاعبين الحاليين (20 لاعبًا بعد آخر backup)
+الاسم ↔ النقاط (أول 10 وفي الأسفل الباقي). أي تعديل بيانات حي لازم يتحفظ بالـ backup → seed:
+`Mohamed Reda 13`, `Marawan Elsaadany 10` (تيم كويوو), `Anas Fayed 9` (تيم شينجالان), `Waleed Allam 9`, `Adel Eltahan 8` (تيم كويوو), `Ahmed Ramadan 6`, `Eyad Eleterby 6`, `Noor Elsherbeny 5`, `Zeyad Meshaal 5`, `Fahd Elboredy 4`, `Ahmed Hamam 3`, `Mohamed Salah 3`, `Ali Maged 2`, `Makram Mahmoud 2`, `Momen Sharaby 2`, `Ahmed Ayaad 1`, `Ahmed Hany 1`, `Yasen Aboelfatoh 1` (تيم شينجالان), `Body Essam 0`, `Omar Emad 0`. إجمالي النقاط = 90.
 
 ## الإعدادات / المصادقة
 - `.env` هو ملف الإعدادات المحلي ويعتبر **مستثنى من git** (مش موجود في الـ repo). فيه:
@@ -46,11 +46,17 @@ Start-Process -FilePath "python" -ArgumentList "server.py --port 5000" -WorkingD
 
 ## المهام Architecture و flow
 - **الصفحات العامة**: `/` (المسار)، `/rules`، `/player/<id>`
-- **لوحة الإدارة**: `/admin` (+ APIs: `/api/ranking`, `/api/players`, PUT/DELETE, `/api/players/<id>/history`, `/api/backup`، auth عبر `/api/auth/login` + CSRF)
+- **لوحة الإدارة**: `/admin` (+ APIs: `/api/ranking`, `/api/players`, PUT/DELETE, `/api/players/<id>/history`, `/api/players/<id>/streak` POST، `/api/players/<id>/mvp` POST، `/api/backup`، auth عبر `/api/auth/login` + CSRF)
 - **ميزة confirmation / trends**: كل لعيب فيه `points_changed_at` + `points_direction`؛ سهم ↑/↓ بنظهر لمدة `TREND_WINDOW_SECONDS = 3*24*60*60`.
 - **history**: جدول `point_history` (player_id, old_points, new_points, delta, created_at). بيُضاف تلقائيًا عند أي تغيير نقاط. `restore_from_seed` بيسترجعه لو موجود في seed.
-- بعد آخر تحديث: لو seed فيه `points_history` لكل لاعب، بيُعيد بناءه؛ اللاعب الجديد بـ 0 نقاط ومفيش history بيبدأ فاضياً (لا تظهر أي سجلات "رجوع 0").
-- **الحالة الحالية**: كل players points=0، history فاضية، seed محدّث كده — بناءً على طلب المستخدم "ارجع كلو للزيرو وابدا من جديد من غير ما يظهر في البروفايل إنهم رجعوا لصفر".
+
+## المميزات (الإضافات الأخيرة)
+- **صور اللاعبين**: عمود `image` (رابط صورة مباشر) في جدول `players` + seed؛ بيظهر بدل الأحرف الأولى في التصنيف والـ podium والبروفايل. بيُدخل من الأدمن (حقل "رابط الصورة" في modal الإضافة + شكل تعديل الصف).
+- **ستريك المشاركة 🔥**: عمود `streak`؛ الأدمن بيدوس زرار "🔥 N" بجانب كل لاعب عشان يزيد +1، وبيظهر `🔥 N` جنب الاسم عند التصنيف والبروفايل. الـ endpoint: `POST /api/players/<id>/streak`.
+- **الـ MVP**: عمود `is_mvp` (bool، واحد بس في كل الدوري — لو اتشغّل لـ لاعب بيتلغى عن البقية). التبديل من الأدمن بزرار نجمة؛ وبيظهر بلون أخضر مميز في التصنيف (صف أخضر + شارة MVP) والـ podium (طوق أخضر) والبروفايل. الـ endpoint: `POST /api/players/<id>/mvp` (toggle).
+- **عدد البطولات**: في أعلى الصفحة الرئيسية بدل "آخر تحديث": `عدد البطولات = إجمالي نقاط كل اللاعبين // 30` (حاليًا 90 → 3). الـ `TOURNAMENT_POINTS = 30` في `public.js`.
+- **ملاحظة مهمة**: `image`/`streak`/`is_mvp` محفوظة في الـ backup والـ seed — أي تعديل منهم من الأدمن لازم يتم حفظه بالطريقة العادية (منزّل backup → استبدال seed → push).
+- **الكاش الحالي**: `public.css/js` = `?v=8` (index/player/rules)، و`admin.css/js` = `?v=7`. زيّد الرقم عند أي تعديل static.
 
 ## الأمان
 - CSS/JS معناها versioned بعلامة `?v=` في templates — إذا عدّلتها زيّد رقم الإصدار عشان الكاش لا يضرب.

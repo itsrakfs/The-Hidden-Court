@@ -35,6 +35,15 @@
       .join("") || "?";
   }
 
+  function avatarInner(p) {
+    var url = (p.image || "").trim();
+    if (url) {
+      return '<img class="avatar-img" src="' + escapeHtml(url) +
+        '" alt="" loading="lazy" onerror="this.remove()" />';
+    }
+    return escapeHtml(initials(p.name));
+  }
+
   function toast(message, isError) {
     var t = els.toast;
     t.textContent = message;
@@ -231,12 +240,18 @@
 
   function viewRowHtml(p) {
     return (
-      '<tr data-id="' + p.id + '">' +
+      '<tr data-id="' + p.id + '"' + (p.is_mvp ? ' class="mvp-row"' : "") + '>' +
         '<td class="th-rank">' + p.rank + "</td>" +
-        '<td class="th-player"><div class="name-cell"><span class="initials">' + escapeHtml(initials(p.name)) +
+        '<td class="th-player"><div class="name-cell"><span class="initials">' + avatarInner(p) +
         "</span><span>" + escapeHtml(p.name) + "</span></div></td>" +
         '<td class="th-team">' + (p.team ? '<span class="team-tag">' + escapeHtml(p.team) + "</span>" : "<span class=\"muted\">\u2014</span>") + "</td>" +
         '<td class="th-num">' + p.points + "</td>" +
+        '<td class="th-streak"><button class="fire-btn' + ((p.streak || 0) > 0 ? " has-streak" : "") +
+          '" data-action="streak" title="\u0625\u0636\u0627\u0641\u0629 1 \u0645\u0634\u0627\u0631\u0643\u0629">\ud83d\udd25 ' + (p.streak || 0) + "</button></td>" +
+        '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
+          '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
+          (p.is_mvp ? "\u2605" : "\u2606") +
+        "</button></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="icon-btn" data-action="edit" title="Edit"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 3l4 4L8 20H4v-4L17 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>' +
           '<button class="icon-btn danger" data-action="delete" title="Delete"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
@@ -250,9 +265,18 @@
     return (
       '<tr data-id="' + p.id + '">' +
         '<td class="th-rank">' + p.rank + "</td>" +
-        '<td class="th-player"><input class="name-input" data-field="name" value="' + escapeHtml(p.name) + '" /></td>' +
+        '<td class="th-player"><div class="name-cell edit-cell">' +
+          '<input class="name-input m-input" data-field="image" value="' + escapeHtml(p.image || "") + '" placeholder="\u0627\u0644\u0635\u0648\u0631\u0629" />' +
+          '<input class="name-input" data-field="name" value="' + escapeHtml(p.name) + '" />' +
+        "</div></td>" +
         '<td class="th-team"><input class="name-input" data-field="team" maxlength="40" value="' + escapeHtml(p.team || "") + '" placeholder="\u0641\u0631\u064a\u0642" /></td>' +
         '<td class="th-num"><input class="text-input" type="number" min="0" data-field="points" value="' + p.points + '" /></td>' +
+        '<td class="th-streak"><button class="fire-btn' + ((p.streak || 0) > 0 ? " has-streak" : "") +
+          '" data-action="streak" title="\u0625\u0636\u0627\u0641\u0629 1 \u0645\u0634\u0627\u0631\u0643\u0629">\ud83d\udd25 ' + (p.streak || 0) + "</button></td>" +
+        '<td class="th-mvp"><button class="star-btn' + (p.is_mvp ? " active" : "") +
+          '" data-action="mvp" title="\u062a\u0639\u064a\u064a\u0646 / \u0625\u0644\u063a\u0627\u0621 MVP">' +
+          (p.is_mvp ? "\u2605" : "\u2606") +
+        "</button></td>" +
         '<td class="th-actions"><div class="row-actions">' +
           '<button class="btn btn-primary inline-save" data-action="save" ' + (saving ? "disabled" : "") + ">" +
             (saving ? "\u062c\u0627\u0631\u064d \u0627\u0644\u062d\u0641\u0638..." : "\u062d\u0641\u0638") +
@@ -276,6 +300,30 @@
     else if (action === "cancel") { state.editingId = null; renderTable(); }
     else if (action === "save") saveRow(id, tr);
     else if (action === "delete") confirmDelete(id);
+    else if (action === "streak") addStreak(id);
+    else if (action === "mvp") toggleMvp(id);
+  }
+
+  function addStreak(id) {
+    api("/api/players/" + id + "/streak", { method: "POST" })
+      .then(function (res) {
+        state.players = res.players || [];
+        state.lastUpdated = res.last_updated || state.lastUpdated;
+        renderDashboard();
+        toast("\ud83d\udd25 \u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 \u0645\u0634\u0627\u0631\u0643\u0629 \u0628\u0646\u062c\u0627\u062d.");
+      })
+      .catch(function (err) { toast(err.message, true); });
+  }
+
+  function toggleMvp(id) {
+    api("/api/players/" + id + "/mvp", { method: "POST" })
+      .then(function (res) {
+        state.players = res.players || [];
+        state.lastUpdated = res.last_updated || state.lastUpdated;
+        renderDashboard();
+        toast("\u2b50 \u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0631\u0643\u0632 (MVP).");
+      })
+      .catch(function (err) { toast(err.message, true); });
   }
 
   function findPlayer(id) {
@@ -303,6 +351,8 @@
         data.name = inp.value.trim();
       } else if (field === "team") {
         data.team = inp.value.trim();
+      } else if (field === "image") {
+        data.image = inp.value.trim();
       } else {
         var val = parseInt(inp.value, 10);
         data[field] = isNaN(val) ? 0 : Math.max(0, val);
@@ -377,6 +427,7 @@
       name: els.pfName.value.trim(),
       points: parseInt(els.pfPoints.value, 10) || 0,
       team: els.pfTeam.value.trim(),
+      image: els.pfImage.value.trim(),
     };
 
     if (!data.name) {
@@ -475,6 +526,7 @@
       pfName: $("pf-name"),
       pfPoints: $("pf-points"),
       pfTeam: $("pf-team"),
+      pfImage: $("pf-image"),
       pfError: $("pf-error"),
       pfSubmit: $("pf-submit"),
 

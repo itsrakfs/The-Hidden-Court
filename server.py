@@ -149,7 +149,10 @@ def migrate_players(conn):
                 created_at          TEXT NOT NULL,
                 updated_at          TEXT NOT NULL,
                 points_changed_at   TEXT NOT NULL DEFAULT '',
-                points_direction    INTEGER NOT NULL DEFAULT 0
+                points_direction    INTEGER NOT NULL DEFAULT 0,
+                image               TEXT NOT NULL DEFAULT '',
+                streak              INTEGER NOT NULL DEFAULT 0,
+                is_mvp              INTEGER NOT NULL DEFAULT 0
             );
 
             INSERT INTO players (id, name, points, team, created_at, updated_at)
@@ -170,6 +173,12 @@ def migrate_players(conn):
         conn.execute("ALTER TABLE players ADD COLUMN points_changed_at TEXT NOT NULL DEFAULT ''")
     if "points_direction" not in cols:
         conn.execute("ALTER TABLE players ADD COLUMN points_direction INTEGER NOT NULL DEFAULT 0")
+    if "image" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN image TEXT NOT NULL DEFAULT ''")
+    if "streak" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN streak INTEGER NOT NULL DEFAULT 0")
+    if "is_mvp" not in cols:
+        conn.execute("ALTER TABLE players ADD COLUMN is_mvp INTEGER NOT NULL DEFAULT 0")
 
 
 def restore_from_seed(conn):
@@ -199,6 +208,15 @@ def restore_from_seed(conn):
         except (TypeError, ValueError):
             points = 0
         team = (entry.get("team") or "").strip()[:40]
+        image = (entry.get("image") or "").strip()[:512]
+        try:
+            streak = max(0, int(entry.get("streak", 0)))
+        except (TypeError, ValueError):
+            streak = 0
+        try:
+            is_mvp = 1 if int(entry.get("is_mvp", 0)) else 0
+        except (TypeError, ValueError):
+            is_mvp = 0
         created = entry.get("created_at") or now_utc()
         updated = entry.get("updated_at") or created
         changed = entry.get("points_changed_at") or ""
@@ -209,9 +227,10 @@ def restore_from_seed(conn):
             direction = 0
         cur = conn.execute(
             """INSERT INTO players
-                   (name, points, team, created_at, updated_at, points_changed_at, points_direction)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (name, points, team, created, updated, changed, direction),
+                   (name, points, team, image, streak, is_mvp,
+                    created_at, updated_at, points_changed_at, points_direction)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (name, points, team, image, streak, is_mvp, created, updated, changed, direction),
         )
         player_id = cur.lastrowid
         seeded += 1
@@ -253,7 +272,10 @@ def init_db():
                 created_at          TEXT NOT NULL,
                 updated_at          TEXT NOT NULL,
                 points_changed_at   TEXT NOT NULL DEFAULT '',
-                points_direction    INTEGER NOT NULL DEFAULT 0
+                points_direction    INTEGER NOT NULL DEFAULT 0,
+                image               TEXT NOT NULL DEFAULT '',
+                streak              INTEGER NOT NULL DEFAULT 0,
+                is_mvp              INTEGER NOT NULL DEFAULT 0
             );
             CREATE TABLE IF NOT EXISTS admins (
                 id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -335,7 +357,10 @@ def fetch_ranking(conn):
                 "rank": i,
                 "name": row["name"],
                 "points": row["points"],
-                "team": row["team"],
+"team": row["team"],
+                "image": row["image"] or "",
+                "streak": row["streak"],
+                "is_mvp": bool(row["is_mvp"]),
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
                 "trend": trend_for(row),
@@ -505,8 +530,9 @@ def validate_player(data):
         points = 0
 
     team = (data.get("team") or "").strip()[:40]
+    image = (data.get("image") or "").strip()[:512]
 
-    return {"name": name, "points": points, "team": team}, None
+    return {"name": name, "points": points, "team": team, "image": image}, None
 
 
 @app.route("/api/players", methods=["POST"])
@@ -521,9 +547,9 @@ def api_add_player():
     ts = now_utc()
     with get_db() as conn:
         cursor = conn.execute(
-            """INSERT INTO players (name, points, team, created_at, updated_at)
-               VALUES (?, ?, ?, ?, ?)""",
-            (payload["name"], payload["points"], payload["team"], ts, ts),
+            """INSERT INTO players (name, points, team, image, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (payload["name"], payload["points"], payload["team"], payload["image"], ts, ts),
         )
         new_id = cursor.lastrowid
         conn.execute(
@@ -566,19 +592,63 @@ def api_update_player(player_id):
 
         conn.execute(
             """UPDATE players
-               SET name = ?, points = ?, team = ?, updated_at = ?,
+               SET name = ?, points = ?, team = ?, image = ?, updated_at = ?,
                    points_changed_at = ?, points_direction = ?
                WHERE id = ?""",
             (
                 payload["name"],
                 new_points,
                 payload["team"],
+                payload["image"],
                 ts,
                 changed_at,
                 direction,
                 player_id,
             ),
         )
+        return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/players/<int:player_id>/streak", methods=["POST"])
+@admin_required
+@csrf_required
+def api_add_streak(player_id):
+    """Increment a player's participation streak (admin clicks the 🔥 +1)."""
+    with get_db() as conn:
+        row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        ts = now_utc()
+        conn.execute(
+            "UPDATE players SET streak = streak + 1, updated_at = ? WHERE id = ?",
+            (ts, player_id),
+        )
+        return jsonify(fetch_ranking(conn))
+
+
+@app.route("/api/players/<int:player_id>/mvp", methods=["POST"])
+@admin_required
+@csrf_required
+def api_toggle_mvp(player_id):
+    """Toggle the single league MVP. Enabling one player clears any other MVP."""
+    with get_db() as conn:
+        row = conn.execute("SELECT * FROM players WHERE id = ?", (player_id,)).fetchone()
+        if not row:
+            return jsonify({"error": "Player not found"}), 404
+
+        ts = now_utc()
+        if row["is_mvp"]:
+            conn.execute(
+                "UPDATE players SET is_mvp = 0, updated_at = ? WHERE id = ?",
+                (ts, player_id),
+            )
+        else:
+            conn.execute("UPDATE players SET is_mvp = 0")
+            conn.execute(
+                "UPDATE players SET is_mvp = 1, updated_at = ? WHERE id = ?",
+                (ts, player_id),
+            )
         return jsonify(fetch_ranking(conn))
 
 
@@ -607,7 +677,8 @@ def api_backup():
 
     with get_db() as conn:
         rows = conn.execute(
-            """SELECT id, name, points, team, created_at, updated_at,
+            """SELECT id, name, points, team, image, streak, is_mvp,
+                      created_at, updated_at,
                       points_changed_at, points_direction
                FROM players ORDER BY points DESC, name COLLATE NOCASE ASC"""
         ).fetchall()

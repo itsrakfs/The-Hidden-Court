@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=6" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=7" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
 </head>
@@ -165,6 +165,8 @@
                 <th class="th-player">اللاعب</th>
                 <th class="th-team">الفريق</th>
                 <th class="th-num">النقاط</th>
+                <th class="th-streak">الستريك</th>
+                <th class="th-mvp">MVP</th>
                 <th class="th-actions"></th>
               </tr>
             </thead>
@@ -205,6 +207,11 @@
           <input id="pf-team" type="text" lang="ar" maxlength="40" placeholder="مثال: Rising Stars" />
           <small class="field-hint" lang="ar">لو سيبتها فاضية هتظهر من غير فريق</small>
         </div>
+        <div class="field">
+          <label for="pf-image" lang="ar">رابط الصورة (اختياري)</label>
+          <input id="pf-image" type="text" lang="en" placeholder="https://.../photo.jpg" />
+          <small class="field-hint" lang="ar">الصق رابط صورة مباشر هتظهر بدل الأحرف الأولى</small>
+        </div>
         <p class="login-error" id="pf-error" hidden lang="ar"></p>
         <div class="modal-actions">
           <button type="button" class="btn btn-ghost" id="modal-cancel" lang="ar">إلغاء</button>
@@ -232,6 +239,6 @@
     <div style="position:fixed;inset:0;display:grid;place-items:center;color:#e9d5ff;font-family:sans-serif;background:#0b0714">الرجاء تفعيل JavaScript.</div>
   </noscript>
 
-  <script src="{{ url_for('static', filename='js/admin.js') }}?v=6"></script>
+  <script src="{{ url_for('static', filename='js/admin.js') }}?v=7"></script>
 </body>
 </html>

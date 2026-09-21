@@ -107,9 +107,28 @@
     var hist = data.history || [];
 
     $("p-name").textContent = p.name;
-    $("p-avatar").textContent = initials(p.name);
-    $("p-avatar").style.background = "linear-gradient(145deg, rgba(124,58,237,.55), rgba(91,33,182,.55))";
+
+    var av = $("p-avatar");
+    if ((p.image || "").trim()) {
+      av.textContent = "";
+      av.style.background = "";
+      av.innerHTML = '<img class="avatar-img" src="' + escapeHtml(p.image.trim()) + '" alt="" loading="lazy" onerror="this.remove()" />';
+    } else {
+      av.innerHTML = "";
+      av.textContent = initials(p.name);
+      av.style.background = "linear-gradient(145deg, rgba(124,58,237,.55), rgba(91,33,182,.55))";
+    }
+
     $("p-points").textContent = p.points;
+
+    var mvpEl = $("p-mvp");
+    if (mvpEl) mvpEl.hidden = !p.is_mvp;
+
+    var streakEl = $("p-streak");
+    if (streakEl) {
+      if (p.streak > 0) { streakEl.textContent = "\ud83d\udd25 " + p.streak; streakEl.hidden = false; }
+      else streakEl.hidden = true;
+    }
 
     if (p.team && p.team.trim()) {
       $("p-team").textContent = p.team.trim();

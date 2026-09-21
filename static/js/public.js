@@ -62,6 +62,26 @@
     return (Date.now() - d.getTime()) < NEW_DAYS * 24 * 60 * 60 * 1000;
   }
 
+  var TOURNAMENT_POINTS = 30; // every 30 points = one league tournament
+
+  function avatarInner(p) {
+    var url = (p.image || "").trim();
+    if (url) {
+      return '<img class="avatar-img" src="' + escapeHtml(url) +
+        '" alt="" loading="lazy" onerror="this.remove()" />';
+    }
+    return escapeHtml(initials(p.name));
+  }
+
+  function mvpBadgeHtml() {
+    return '<span class="mvp-badge">MVP</span>';
+  }
+
+  function streakHtml(p) {
+    if (!(p.streak > 0)) return "";
+    return '<span class="streak-chip">\ud83d\udd25 ' + p.streak + '</span>';
+  }
+
   // ------------------------------------------------------------------ fetch
   function fetchRanking(isAuto) {
     fetch("/api/ranking", { cache: "no-store" })
@@ -72,10 +92,10 @@
       .then(function (data) {
         var changed =
           JSON.stringify(data.players.map(function (p) {
-            return [p.id, p.name, p.points, p.team, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.updated_at];
           })) !==
           JSON.stringify(state.players.map(function (p) {
-            return [p.id, p.name, p.points, p.team, p.updated_at];
+            return [p.id, p.name, p.points, p.team, p.image, p.streak, p.is_mvp, p.updated_at];
           }));
 
         state.players = data.players || [];
@@ -163,11 +183,11 @@
     els.statAvg.textContent = state.players.length
       ? Math.round(totalPoints / state.players.length)
       : "\u2014";
-    els.statUpdated.textContent = shortDate(state.lastUpdated);
+    animateValue(els.statTournaments, Math.floor(totalPoints / TOURNAMENT_POINTS), "tournaments");
   }
 
   // Animated number counter (animates the first paint only; instant afterwards)
-  var statsFirst = { players: true, points: true };
+  var statsFirst = { players: true, points: true, tournaments: true };
   function animateValue(el, target, key) {
     if (!el) return;
     if (statsFirst[key]) {
@@ -225,7 +245,7 @@
         if (card) card.style.display = "none";
         els["pod" + r + "Name"].textContent = "\u2014";
         els["pod" + r + "Points"].textContent = "0";
-        els["pod" + r + "Avatar"].textContent = "?";
+        els["pod" + r + "Avatar"].innerHTML = "?";
         els["pod" + r + "Avatar"].className = "pod-avatar";
         els["pod" + r + "Avatar"].onclick = null;
         var t = els["pod" + r + "Trend"];
@@ -234,16 +254,18 @@
       }
       if (card) {
         card.style.display = "";
+        if (p.is_mvp) card.classList.add("mvp"); else card.classList.remove("mvp");
         void card.offsetWidth; // reflow to restart CSS animation
         card.classList.add("pod-anim");
       }
-      els["pod" + r + "Name"].textContent = p.name;
       els["pod" + r + "Points"].textContent = p.points;
-      els["pod" + r + "Avatar"].textContent = initials(p.name);
 
       var nameEl = els["pod" + r + "Name"];
-      nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>';
+      nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>' +
+        (p.is_mvp ? mvpBadgeHtml() : "") +
+        streakHtml(p);
       if (els["pod" + r + "Avatar"]) {
+        els["pod" + r + "Avatar"].innerHTML = avatarInner(p);
         els["pod" + r + "Avatar"].className = "pod-avatar pod-avatar-link";
         els["pod" + r + "Avatar"].onclick = function () { location.href = "/player/" + p.id; };
       }
@@ -280,14 +302,16 @@
     for (var i = 0; i < list.length; i++) {
       var p = list[i];
       html +=
-        '<tr data-player-id="' + p.id + '">' +
+        '<tr data-player-id="' + p.id + '"' + (p.is_mvp ? ' class="mvp-row"' : "") + '>' +
           '<td class="th-rank"><span class="num">' + p.rank + '</span></td>' +
           '<td class="th-player"><div class="player-cell">' +
-            '<a class="initials" href="/player/' + p.id + '" aria-label="بروفايل ' + escapeHtml(p.name) + '">' + escapeHtml(initials(p.name)) + '</a>' +
+            '<a class="initials" href="/player/' + p.id + '" aria-label="\u0628\u0631\u0648\u0641\u0627\u064a\u0644 ' + escapeHtml(p.name) + '">' + avatarInner(p) + '</a>' +
             '<span class="player-name-cell">' +
               '<a class="player-link" href="/player/' + p.id + '">' +
                 escapeHtml(p.name) +
               '</a>' +
+              (p.is_mvp ? mvpBadgeHtml() : "") +
+              streakHtml(p) +
               (isNew(p) ? '<span class="new-badge">\u062c\u062f\u064a\u062f</span>' : "") +
             '</span>' +
             teamLabel(p) +
@@ -402,7 +426,7 @@
       statPlayers: $("stat-players"),
       statPoints: $("stat-points"),
       statAvg: $("stat-avg"),
-      statUpdated: $("stat-updated"),
+      statTournaments: $("stat-tournaments"),
       podiumSection: $("podium-section"),
       podium: $("podium"),
       search: $("search-input"),
