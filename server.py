@@ -227,7 +227,7 @@ def restore_from_seed(conn):
         except (TypeError, ValueError):
             points = 0
         team = (entry.get("team") or "").strip()[:40]
-        image = (entry.get("image") or "").strip()[:512]
+        image = (entry.get("image") or "").strip()[:250000]
         try:
             streak = max(0, int(entry.get("streak", 0)))
         except (TypeError, ValueError):
@@ -647,7 +647,7 @@ def validate_player(data):
         points = 0
 
     team = (data.get("team") or "").strip()[:40]
-    image = (data.get("image") or "").strip()[:512]
+    image = (data.get("image") or "").strip()[:250000]
 
     return {"name": name, "points": points, "team": team, "image": image}, None
 

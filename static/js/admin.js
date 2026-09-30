@@ -11,6 +11,7 @@
     search: "",
     editingId: null,      // player id currently being row-edited (null = no inline edit)
     savingId: null,       // id whose Save button is pending
+    cropTarget: null,     // input element that will receive the cropped image
   };
 
   var els = {};
@@ -282,11 +283,25 @@
 
   function editRowHtml(p) {
     var saving = state.savingId === p.id;
+    var img = (p.image || "").trim();
+    var isData = img.indexOf("data:") === 0;
+    var thumbHtml = img
+      ? '<img src="' + escapeHtml(img) + '" alt="" onerror="this.remove()" />'
+      : "";
     return (
       '<tr data-id="' + p.id + '">' +
         '<td class="th-rank">' + p.rank + "</td>" +
-        '<td class="th-player"><div class="name-cell edit-cell">' +
-          '<input class="name-input m-input" data-field="image" value="' + escapeHtml(p.image || "") + '" placeholder="\u0627\u0644\u0635\u0648\u0631\u0629" />' +
+        '<td class="th-player"><div class="edit-img-row">' +
+          '<span class="edit-row-thumb">' + thumbHtml + "</span>" +
+          '<input class="name-input m-input" data-field="image" value="' +
+            escapeHtml(isData ? "" : img) + '" data-image="' + escapeHtml(img) +
+            '" placeholder="' + (isData
+              ? "\u0635\u0648\u0631\u0629 \u0645\u0631\u0641\u0648\u0639\u0629 \u2014 \u0627\u0636\u063a\u0637 \u0623\u0648 \u0627\u062d\u0630\u0641\u0647\u0627"
+              : "\u0631\u0627\u0628\u0637 \u0635\u0648\u0631\u0629") + '" />' +
+          '<button class="mini-btn edit-photo-btn" data-action="photo" title="\u0631\u0641\u0639 \u0623\u0648 \u0642\u0635 \u0635\u0648\u0631\u0629 \u0645\u0646 \u0627\u0644\u062c\u0647\u0627\u0632">\ud83d\udde4</button>' +
+          '<button class="mini-btn edit-photo-btn" data-action="photo-clear" title="\u0625\u0632\u0627\u0644\u0629 \u0627\u0644\u0635\u0648\u0631\u0629">\u2715</button>' +
+        "</div>" +
+        '<div class="name-cell edit-cell">' +
           '<input class="name-input" data-field="name" value="' + escapeHtml(p.name) + '" />' +
         "</div></td>" +
         '<td class="th-team"><input class="name-input" data-field="team" maxlength="40" value="' + escapeHtml(p.team || "") + '" placeholder="\u0641\u0631\u064a\u0642" /></td>' +
@@ -334,6 +349,8 @@
     else if (action === "cancel") { state.editingId = null; renderTable(); }
     else if (action === "save") saveRow(id, tr);
     else if (action === "delete") confirmDelete(id);
+    else if (action === "photo") openRowPhoto(tr);
+    else if (action === "photo-clear") clearRowPhoto(tr);
     else if (action === "streak") addStreak(id, btn.getAttribute("data-delta"));
     else if (action === "streak-undo") undoStreak(id);
     else if (action === "mvp") toggleMvp(id);
@@ -422,7 +439,9 @@
       } else if (field === "team") {
         data.team = inp.value.trim();
       } else if (field === "image") {
-        data.image = inp.value.trim();
+        // A stored upload lives in data-image (kept out of the visible box);
+        // typing a link in the box overrides it.
+        data.image = inp.value.trim() || inp.dataset.image || "";
       } else {
         var val = parseInt(inp.value, 10);
         data[field] = isNaN(val) ? 0 : Math.max(0, val);
@@ -483,6 +502,8 @@
     els.pfId.value = "";
     els.modalTitle.textContent = "\u0625\u0636\u0627\u0641\u0629 \u0644\u0627\u0639\u0628 \u062c\u062f\u064a\u062f";
     els.pfError.hidden = true;
+    els.pfFile.value = "";
+    updateThumb(els.pfImage.value || "");
     els.modalBg.hidden = false;
     setTimeout(function () { els.pfName.focus(); }, 50);
   }
@@ -530,6 +551,201 @@
     els.pfError.hidden = false;
   }
 
+  function updateThumb(src) {
+    var t = els.pfThumb;
+    var url = (src || "").trim();
+    if (url) {
+      t.innerHTML = '<img class="thumb-img" src="' + escapeHtml(url) + '" alt="" onerror="this.remove()" />';
+      els.pfRemove.hidden = false;
+    } else {
+      t.textContent = "?";
+      els.pfRemove.hidden = true;
+    }
+  }
+
+  // --------------------------------------------------------------- image crop
+  var crop = {
+    img: null,      // HTMLImageElement
+    scale: 1,       // cover base scale
+    zoom: 1,
+    dragX: 0, dragY: 0,   // cumulative pan offset (canvas px)
+    startX: 0, startY: 0, // pointer start (client px)
+    imgX0: 0, imgY0: 0,   // pointer-start cumulative offset
+    dragging: false,
+  };
+
+  var CROP_SIZE = 420;
+
+  function prepareCropImage(src, cb) {
+    var img = new Image();
+    img.onload = function () { cb(null, img); };
+    img.onerror = function () { cb(new Error("\u062a\u0639\u0630\u0631 \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0635\u0648\u0631\u0629."), null); };
+    img.src = src;
+  }
+
+  function cropInit(img) {
+    crop.img = img;
+    var base = Math.max(CROP_SIZE / img.naturalWidth, CROP_SIZE / img.naturalHeight);
+    crop.scale = base;
+    crop.zoom = 1;
+    crop.dragX = 0; crop.dragY = 0;
+    els.cropZoom.value = "1";
+    cropDraw();
+  }
+
+  function cropDraw() {
+    var canvas = els.cropCanvas;
+    var ctx = canvas.getContext("2d");
+    var z = crop.zoom;
+    var s = crop.scale * z;
+    var dw = crop.img.naturalWidth * s;
+    var dh = crop.img.naturalHeight * s;
+    var maxX = Math.max(0, (dw - CROP_SIZE) / 2);
+    var maxY = Math.max(0, (dh - CROP_SIZE) / 2);
+    crop.dragX = Math.max(-maxX, Math.min(maxX, crop.dragX));
+    crop.dragY = Math.max(-maxY, Math.min(maxY, crop.dragY));
+    var drawX = -dw / 2 + CROP_SIZE / 2 + crop.dragX;
+    var drawY = -dh / 2 + CROP_SIZE / 2 + crop.dragY;
+
+    ctx.clearRect(0, 0, CROP_SIZE, CROP_SIZE);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CROP_SIZE / 2, CROP_SIZE / 2, CROP_SIZE / 2 - 1, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(crop.img, drawX, drawY, dw, dh);
+    ctx.restore();
+    ctx.strokeStyle = "rgba(168,85,247,.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(CROP_SIZE / 2, CROP_SIZE / 2, CROP_SIZE / 2 - 1, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function cropSave() {
+    if (!crop.img) return;
+    var s = crop.scale * crop.zoom;
+    var sx = crop.img.naturalWidth / 2 - (CROP_SIZE / 2 + crop.dragX) / s;
+    var sy = crop.img.naturalHeight / 2 - (CROP_SIZE / 2 + crop.dragY) / s;
+    var side = CROP_SIZE / s;
+
+    var out = document.createElement("canvas");
+    out.width = 256;
+    out.height = 256;
+    var octx = out.getContext("2d");
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = "high";
+    octx.drawImage(crop.img, sx, sy, side, side, 0, 0, 256, 256);
+    var dataUrl = out.toDataURL("image/jpeg", 0.88);
+    var target = state.cropTarget || els.pfImage;
+    if (!target) return;
+    if (target === els.pfImage) {
+      target.value = dataUrl;
+      updateThumb(dataUrl);
+    } else {
+      target.value = "";
+      target.dataset.image = dataUrl;
+      updateRowThumb(target);
+    }
+    cropClose();
+    toast("\ud83d\udcf7 \u062a\u0645 \u0636\u0628\u0637 \u0627\u0644\u0635\u0648\u0631\u0629.");
+  }
+
+  function updateRowThumb(input) {
+    var tr = input.closest("tr");
+    if (!tr) return;
+    var thumb = tr.querySelector(".edit-row-thumb");
+    if (!thumb) return;
+    var url = (input.value || "").trim() || input.dataset.image || "";
+    thumb.innerHTML = url
+      ? '<img src="' + escapeHtml(url) + '" alt="" onerror="this.remove()" />'
+      : "";
+  }
+
+  function openCrop() {
+    els.cropBg.hidden = false;
+    setTimeout(function () { cropDraw(); }, 30);
+  }
+
+  function cropClose() {
+    els.cropBg.hidden = true;
+    crop.img = null;
+  }
+
+  function handlePfFile(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      prepareCropImage(ev.target.result, function (err, img) {
+        if (err) { toast(err.message, true); return; }
+        cropInit(img);
+        if (els.cropBg.hidden) openCrop();
+        else cropDraw();
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function cropZoomChanged() {
+    crop.zoom = parseFloat(els.cropZoom.value) || 1;
+    cropDraw();
+  }
+
+  function cropStageDown(e) {
+    if (!crop.img) return;
+    crop.dragging = true;
+    crop.startX = e.clientX;
+    crop.startY = e.clientY;
+    crop.imgX0 = crop.dragX;
+    crop.imgY0 = crop.dragY;
+    els.cropStage.classList.add("dragging");
+    e.preventDefault();
+  }
+
+  function cropStageMove(e) {
+    if (!crop.dragging) return;
+    var disp = els.cropStage.clientWidth || CROP_SIZE;
+    var k = CROP_SIZE / disp;
+    crop.dragX = crop.imgX0 + (e.clientX - crop.startX) * k;
+    crop.dragY = crop.imgY0 + (e.clientY - crop.startY) * k;
+    cropDraw();
+    e.preventDefault();
+  }
+
+  function cropStageUp() {
+    crop.dragging = false;
+    els.cropStage.classList.remove("dragging");
+  }
+
+  function openRowPhoto(tr) {
+    var input = tr.querySelector('[data-field="image"]');
+    if (!input) return;
+    state.cropTarget = input;
+    var existing = (input.value || "").trim() || input.dataset.image || "";
+    if (existing) {
+      // already has a photo -> reopen the cropper on it so it can be adjusted
+      prepareCropImage(existing, function (err, img) {
+        if (err) { els.pfFile.value = ""; els.pfFile.click(); return; }
+        cropInit(img);
+        openCrop();
+      });
+    } else {
+      els.pfFile.value = "";
+      els.pfFile.click();
+    }
+  }
+
+  function clearRowPhoto(tr) {
+    var input = tr.querySelector('[data-field="image"]');
+    if (!input) return;
+    input.value = "";
+    input.dataset.image = "";
+    updateRowThumb(input);
+    toast("\ud83d\uddd1 \u062a\u0645 \u0625\u0632\u0627\u0644\u0629 \u0627\u0644\u0635\u0648\u0631\u0629 (\u0627\u062d\u0641\u0638 \u0627\u0644\u0635\u0641 \u0644\u062a\u062d\u0641\u064a\u0638\u0647\u0627).");
+  }
+
   // ---------------------------------------------------------------- bind
   function bind() {
     els.loginForm.addEventListener("submit", handleLogin);
@@ -545,12 +761,40 @@
     els.modalCancel.addEventListener("click", closeModal);
     els.modalBg.addEventListener("click", function (e) { if (e.target === els.modalBg) closeModal(); });
     els.playerForm.addEventListener("submit", submitPlayer);
+    els.pfUpload.addEventListener("click", function () {
+      state.cropTarget = els.pfImage;
+      els.pfFile.value = "";
+      els.pfFile.click();
+    });
+    els.pfFile.addEventListener("change", handlePfFile);
+    els.pfRemove.addEventListener("click", function () {
+      els.pfImage.value = "";
+      updateThumb("");
+    });
+    els.pfImage.addEventListener("input", function () { updateThumb(els.pfImage.value); });
+
+    els.cropClose.addEventListener("click", cropClose);
+    els.cropCancel.addEventListener("click", cropClose);
+    els.cropBg.addEventListener("click", function (e) { if (e.target === els.cropBg) cropClose(); });
+    els.cropSave.addEventListener("click", cropSave);
+    els.cropReplace.addEventListener("click", function () {
+      els.pfFile.value = "";
+      els.pfFile.click();
+    });
+    els.cropZoom.addEventListener("input", cropZoomChanged);
+    els.cropStage.addEventListener("pointerdown", cropStageDown);
+    document.addEventListener("pointermove", cropStageMove);
+    document.addEventListener("pointerup", cropStageUp);
 
     els.confirmCancel.addEventListener("click", function () { els.confirmBg.hidden = true; });
     els.confirmBg.addEventListener("click", function (e) { if (e.target === els.confirmBg) els.confirmBg.hidden = true; });
     els.confirmYes.addEventListener("click", doDelete);
 
     els.adminBody.addEventListener("click", handleTableClick);
+    els.adminBody.addEventListener("input", function (e) {
+      var t = e.target;
+      if (t && t.dataset && t.dataset.field === "image") updateRowThumb(t);
+    });
     els.adminSearch.addEventListener("input", function (e) {
       state.search = e.target.value;
       renderTable();
@@ -593,6 +837,7 @@
       if (e.key === "Escape") {
         if (!els.modalBg.hidden) els.modalBg.hidden = true;
         if (!els.confirmBg.hidden) els.confirmBg.hidden = true;
+        if (!els.cropBg.hidden) cropClose();
       }
     });
   }
@@ -634,8 +879,21 @@
       pfPoints: $("pf-points"),
       pfTeam: $("pf-team"),
       pfImage: $("pf-image"),
+      pfThumb: $("pf-thumb"),
+      pfUpload: $("pf-upload"),
+      pfRemove: $("pf-remove"),
+      pfFile: $("pf-file"),
       pfError: $("pf-error"),
       pfSubmit: $("pf-submit"),
+
+      cropBg: $("crop-bg"),
+      cropCanvas: $("crop-canvas"),
+      cropStage: $("crop-stage"),
+      cropZoom: $("crop-zoom"),
+      cropClose: $("crop-close"),
+      cropCancel: $("crop-cancel"),
+      cropSave: $("crop-save"),
+      cropReplace: $("crop-replace"),
 
       confirmBg: $("confirm-bg"),
       confirmText: $("confirm-text"),

@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=13" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=15" />
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120622'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='30' font-weight='bold' fill='%23a855f7' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" />
 </head>
@@ -222,9 +222,17 @@
           <small class="field-hint" lang="ar">لو سيبتها فاضية هتظهر من غير فريق</small>
         </div>
         <div class="field">
-          <label for="pf-image" lang="ar">رابط الصورة (اختياري)</label>
+          <label for="pf-image" lang="ar">صورة اللاعب (اختياري)</label>
+          <div class="img-row">
+            <span class="thumb-circle" id="pf-thumb"></span>
+            <div class="img-actions">
+              <button type="button" class="btn btn-ghost btn-sm" id="pf-upload" lang="ar">📤 رفع صورة من الجهاز</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="pf-remove" lang="ar" hidden>إزالة الصورة</button>
+            </div>
+          </div>
           <input id="pf-image" type="text" lang="en" placeholder="https://.../photo.jpg" />
-          <small class="field-hint" lang="ar">الصق رابط صورة مباشر هتظهر بدل الأحرف الأولى</small>
+          <input id="pf-file" type="file" accept="image/*" hidden />
+          <small class="field-hint" lang="ar">الصق رابط صورة مباشر أو ارفع صورة من جهازك وقصّها زي ما تحب — هتظهر بدل الأحرف الأولى</small>
         </div>
         <p class="login-error" id="pf-error" hidden lang="ar"></p>
         <div class="modal-actions">
@@ -232,6 +240,30 @@
           <button type="submit" class="btn btn-primary" id="pf-submit" lang="ar">حفظ</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="crop-bg" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 lang="ar">قصّ الصورة</h2>
+        <button class="icon-btn" id="crop-close" aria-label="إغلاق">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="crop-hint" lang="ar">اسحب الصورة لتحريكها، وغيِّر التقريب ثم اضغط حفظ</p>
+      <div class="crop-stage" id="crop-stage">
+        <canvas id="crop-canvas" width="420" height="420"></canvas>
+      </div>
+      <div class="crop-tools">
+        <label for="crop-zoom" lang="ar">التقريب</label>
+        <input type="range" id="crop-zoom" min="1" max="4" step="0.01" value="1" />
+        <button type="button" class="btn btn-ghost btn-sm" id="crop-replace" lang="ar">صورة أخرى</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="crop-cancel" lang="ar">إلغاء</button>
+        <button type="button" class="btn btn-primary" id="crop-save" lang="ar">حفظ</button>
+      </div>
     </div>
   </div>
 
@@ -253,6 +285,6 @@
     <div style="position:fixed;inset:0;display:grid;place-items:center;color:#e9d5ff;font-family:sans-serif;background:#0b0714">الرجاء تفعيل JavaScript.</div>
   </noscript>
 
-  <script src="{{ url_for('static', filename='js/admin.js') }}?v=13"></script>
+  <script src="{{ url_for('static', filename='js/admin.js') }}?v=15"></script>
 </body>
 </html>
