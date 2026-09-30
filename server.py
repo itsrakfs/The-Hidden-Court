@@ -109,6 +109,16 @@ app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 
+_PUBLIC_API_PATTERNS = (
+    re.compile(r"^/api/ranking/?$"),
+    re.compile(r"^/api/players/\d+/history/?$"),
+)
+
+
+def _is_public_api(path):
+    return any(p.match(path) for p in _PUBLIC_API_PATTERNS)
+
+
 @app.after_request
 def add_cache_and_security_headers(response):
     # Static assets are content-hashed via ?v= in the templates, so they can
@@ -122,6 +132,16 @@ def add_cache_and_security_headers(response):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+
+    # The public site is a static GitHub Pages build, so it reads the ranking
+    # and player-history API cross-origin. Only these read-only GET endpoints
+    # are exposed; every admin/auth/write endpoint stays same-origin and is
+    # never given CORS headers, so the session cookie cannot be used from
+    # another site. No Allow-Credentials is sent on purpose.
+    if request.method == "GET" and _is_public_api(request.path):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Vary"] = "Origin"
+
     return response
 
 

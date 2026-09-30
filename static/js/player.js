@@ -226,11 +226,7 @@
   }
 
   function load() {
-    fetch("/api/players/" + PLAYER_ID + "/history", { cache: "no-store" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
+    TH.fetchJSON("/api/players/" + PLAYER_ID + "/history")
       .then(render)
       .catch(function () {
         var el = $("h-empty");

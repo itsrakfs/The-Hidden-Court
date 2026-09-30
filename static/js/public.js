@@ -92,11 +92,7 @@
 
   // ------------------------------------------------------------------ fetch
   function fetchRanking(isAuto) {
-    fetch("/api/ranking", { cache: "no-store" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
+    TH.fetchJSON("/api/ranking")
       .then(function (data) {
         var changed =
           JSON.stringify(data.players.map(function (p) {
@@ -114,7 +110,9 @@
 
         var foot = els.footStatus;
         if (foot) {
-          if (isAuto) {
+          if (data.__from_fallback) {
+            foot.textContent = "\u0646\u0633\u062e\u0629 \u0645\u062d\u0641\u0648\u0638\u0629 (\u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644)";
+          } else if (isAuto) {
             foot.textContent = changed
               ? "\u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a"
               : "\u062a\u062d\u062f\u064a\u062b \u062a\u0644\u0642\u0627\u0626\u064a";
@@ -271,7 +269,7 @@
       els["pod" + r + "Points"].textContent = p.points;
 
       var nameEl = els["pod" + r + "Name"];
-      nameEl.innerHTML = '<a class="pod-link" href="/player/' + p.id + '">' + escapeHtml(p.name) + '</a>' +
+      nameEl.innerHTML = '<a class="pod-link" href="' + TH.playerUrl(p.id) + '">' + escapeHtml(p.name) + '</a>' +
         (p.is_mvp ? mvpBadgeHtml() : "") +
         streakHtml(p) +
         mvpCountHtml(p) +
@@ -279,7 +277,7 @@
       if (els["pod" + r + "Avatar"]) {
         els["pod" + r + "Avatar"].innerHTML = avatarInner(p);
         els["pod" + r + "Avatar"].className = "pod-avatar pod-avatar-link";
-        els["pod" + r + "Avatar"].onclick = function () { location.href = "/player/" + p.id; };
+        els["pod" + r + "Avatar"].onclick = function () { location.href = TH.playerUrl(p.id); };
       }
 
       var team = els["pod" + r + "Team"];
@@ -317,9 +315,9 @@
         '<tr data-player-id="' + p.id + '"' + (p.is_mvp ? ' class="mvp-row"' : "") + '>' +
           '<td class="th-rank"><span class="num">' + p.rank + '</span></td>' +
           '<td class="th-player"><div class="player-cell">' +
-            '<a class="initials" href="/player/' + p.id + '" aria-label="\u0628\u0631\u0648\u0641\u0627\u064a\u0644 ' + escapeHtml(p.name) + '">' + avatarInner(p) + '</a>' +
+            '<a class="initials" href="' + TH.playerUrl(p.id) + '" aria-label="\u0628\u0631\u0648\u0641\u0627\u064a\u0644 ' + escapeHtml(p.name) + '">' + avatarInner(p) + '</a>' +
             '<span class="player-name-cell">' +
-              '<a class="player-link" href="/player/' + p.id + '">' +
+              '<a class="player-link" href="' + TH.playerUrl(p.id) + '">' +
                 escapeHtml(p.name) +
               '</a>' +
               (p.is_mvp ? mvpBadgeHtml() : "") +

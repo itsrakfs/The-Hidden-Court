@@ -8,3 +8,7 @@ players.db
 .DS_Store
 players.db-shm
 players.db-wal
+site/
+srv.log
+srv.err
+
